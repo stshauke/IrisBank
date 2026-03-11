@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+{% block title %}Tableau de bord{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Bonjour, {{ user.prenom }} 👋</h1>
+        <p class="page-subtitle">{{ "now"|date("l d MMMM yyyy") }} — Voici un aperçu de vos finances</p>
+    </div>
+    <a href="{{ path('app_comptes_new') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nouveau compte
+    </a>
+</div>
+
+{# STAT CARDS #}
+<div class="stats-grid">
+    <div class="stat-card" style="--accent-color: #6366f1;">
+        <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+        <div class="stat-value">{{ soldeTotal|number_format(2, ',', ' ') }} €</div>
+        <div class="stat-label">Solde total</div>
+    </div>
+    <div class="stat-card" style="--accent-color: #10b981;">
+        <div class="stat-icon" style="background: rgba(16,185,129,0.15); color: #6ee7b7;"><i class="fas fa-university"></i></div>
+        <div class="stat-value">{{ comptes|length }}</div>
+        <div class="stat-label">Compte{{ comptes|length > 1 ? 's' : '' }} bancaire{{ comptes|length > 1 ? 's' : '' }}</div>
+    </div>
+    <div class="stat-card" style="--accent-color: #f59e0b;">
+        <div class="stat-icon" style="background: rgba(245,158,11,0.15); color: #fcd34d;"><i class="fas fa-exchange-alt"></i></div>
+        <div class="stat-value">{{ dernieresTransactions|length }}</div>
+        <div class="stat-label">Dernières transactions</div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    {# MES COMPTES #}
+    <div>
+        <div class="card-header" style="margin-bottom: 16px;">
+            <h2 class="card-title">Mes comptes</h2>
+            <a href="{{ path('app_comptes_list') }}" class="btn btn-outline btn-sm">Voir tous</a>
+        </div>
+
+        {% if comptes is empty %}
+        <div class="empty-state" style="padding: 40px; background: #111827; border: 1px solid #1e293b; border-radius: 16px;">
+            <div class="empty-icon"><i class="fas fa-university"></i></div>
+            <div class="empty-title">Aucun compte</div>
+            <div class="empty-text">Ouvrez votre premier compte bancaire maintenant</div>
+            <a href="{{ path('app_comptes_new') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Ouvrir un compte
+            </a>
+        </div>
+        {% else %}
+        <div class="comptes-grid">
+            {% for compte in comptes %}
+            <a href="{{ path('app_comptes_show', {id: compte.id}) }}" style="text-decoration: none;">
+                <div class="compte-card {{ compte.type }}" style="cursor: pointer;">
+                    <div class="badge">
+                        <i class="fas fa-{% if compte.type == 'courant' %}credit-card{% elseif compte.type == 'livret_a' %}piggy-bank{% else %}home{% endif %}"></i>
+                        {{ compte.typeLabel }}
+                    </div>
+
+                    {% if compte.isBloque %}
+                    <span class="status-badge status-bloque" style="position: absolute; top: 16px; right: 16px;">
+                        <i class="fas fa-lock"></i> Bloqué
+                    </span>
+                    {% endif %}
+
+                    <div class="compte-solde">{{ compte.soldeFloat|number_format(2, ',', ' ') }} €</div>
+                    <div class="compte-iban">{{ compte.iban }}</div>
+
+                    <div class="compte-actions">
+                        {% if compte.isActif %}
+                        <a href="{{ path('app_depot', {id: compte.id}) }}" class="btn btn-success btn-sm" onclick="event.stopPropagation()">
+                            <i class="fas fa-arrow-down"></i> Dépôt
+                        </a>
+                        <a href="{{ path('app_retrait', {id: compte.id}) }}" class="btn btn-warning btn-sm" onclick="event.stopPropagation()">
+                            <i class="fas fa-arrow-up"></i> Retrait
+                        </a>
+                        {% else %}
+                        <span style="font-size: 12px; color: #fca5a5;"><i class="fas fa-lock"></i> Compte bloqué</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    {# DERNIÈRES TRANSACTIONS #}
+    <div>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Activité récente</h2>
+                <a href="{{ path('app_transactions_history') }}" class="btn btn-outline btn-sm">Historique</a>
+            </div>
+
+            {% if dernieresTransactions is empty %}
+            <div class="empty-state" style="padding: 32px 16px;">
+                <div class="empty-icon" style="font-size: 36px;"><i class="fas fa-history"></i></div>
+                <div class="empty-text" style="margin-bottom: 0;">Aucune transaction récente</div>
+            </div>
+            {% else %}
+            {% for tx in dernieresTransactions %}
+            <div class="tx-item">
+                <div class="tx-icon {{ tx.isCredit ? 'credit' : 'debit' }}">
+                    <i class="fas fa-{% if tx.type == 'depot' %}arrow-down{% elseif tx.type == 'retrait' %}arrow-up{% else %}exchange-alt{% endif %}"></i>
+                </div>
+                <div class="tx-info">
+                    <div class="tx-label">{{ tx.libelle ?? tx.typeLabel }}</div>
+                    <div class="tx-date">{{ tx.createdAt|date('d/m/Y à H:i') }}</div>
+                </div>
+                <div class="tx-amount {{ tx.isCredit ? 'amount-credit' : 'amount-debit' }}">
+                    {{ tx.isCredit ? '+' : '-' }}{{ tx.montantFloat|number_format(2, ',', ' ') }} €
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+
+        {# VIREMENT RAPIDE #}
+        <div class="card" style="margin-top: 20px;">
+            <div class="card-header">
+                <h2 class="card-title">Accès rapide</h2>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <a href="{{ path('app_virement') }}" class="btn btn-outline" style="justify-content: flex-start;">
+                    <i class="fas fa-paper-plane" style="color: #6366f1;"></i> Effectuer un virement
+                </a>
+                <a href="{{ path('app_profil') }}" class="btn btn-outline" style="justify-content: flex-start;">
+                    <i class="fas fa-user-cog" style="color: #6366f1;"></i> Mon profil
+                </a>
+                <a href="{{ path('app_comptes_new') }}" class="btn btn-outline" style="justify-content: flex-start;">
+                    <i class="fas fa-plus" style="color: #10b981;"></i> Ouvrir un nouveau compte
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

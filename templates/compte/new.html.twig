@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+{% block title %}Ouvrir un compte{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <a href="{{ path('app_comptes_list') }}" style="color: #94a3b8; text-decoration: none; font-size: 14px;">
+            <i class="fas fa-arrow-left"></i> Mes comptes
+        </a>
+        <h1 class="page-title" style="margin-top: 8px;">Ouvrir un compte</h1>
+        <p class="page-subtitle">Choisissez le type de compte qui vous convient</p>
+    </div>
+</div>
+
+<div style="max-width: 640px;">
+    {{ form_start(form) }}
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px;">
+        <label class="type-card" for="compte_type_0" style="cursor: pointer;">
+            <input type="radio" id="compte_type_0" name="compte[type]" value="courant" 
+                   style="position: absolute; opacity: 0;" onchange="selectType(this)">
+            <div class="type-card-inner" id="card-courant">
+                <div style="font-size: 32px; margin-bottom: 12px;">💳</div>
+                <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Compte Courant</div>
+                <div style="font-size: 12px; color: #64748b; line-height: 1.5;">Pour vos opérations courantes, virements et prélèvements</div>
+            </div>
+        </label>
+
+        <label class="type-card" for="compte_type_1" style="cursor: pointer;">
+            <input type="radio" id="compte_type_1" name="compte[type]" value="livret_a"
+                   style="position: absolute; opacity: 0;" onchange="selectType(this)">
+            <div class="type-card-inner" id="card-livret_a">
+                <div style="font-size: 32px; margin-bottom: 12px;">🐷</div>
+                <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">Livret A</div>
+                <div style="font-size: 12px; color: #64748b; line-height: 1.5;">Épargne réglementée, disponible à tout moment</div>
+            </div>
+        </label>
+
+        <label class="type-card" for="compte_type_2" style="cursor: pointer;">
+            <input type="radio" id="compte_type_2" name="compte[type]" value="pel"
+                   style="position: absolute; opacity: 0;" onchange="selectType(this)">
+            <div class="type-card-inner" id="card-pel">
+                <div style="font-size: 32px; margin-bottom: 12px;">🏠</div>
+                <div style="font-size: 15px; font-weight: 700; margin-bottom: 8px;">PEL</div>
+                <div style="font-size: 12px; color: #64748b; line-height: 1.5;">Plan Épargne Logement, pour préparer votre projet immobilier</div>
+            </div>
+        </label>
+    </div>
+
+    {{ form_errors(form) }}
+
+    <button type="submit" class="btn btn-primary btn-lg" style="justify-content: center; width: 100%;">
+        <i class="fas fa-university"></i>
+        Ouvrir ce compte
+    </button>
+    {{ form_end(form) }}
+</div>
+
+<style>
+.type-card { position: relative; display: block; }
+.type-card-inner {
+    background: #111827;
+    border: 2px solid #1e293b;
+    border-radius: 16px;
+    padding: 24px 16px;
+    text-align: center;
+    transition: all 0.25s ease;
+}
+.type-card-inner:hover { border-color: #6366f1; background: #1a2235; }
+.type-card-inner.selected { border-color: #6366f1; background: rgba(99,102,241,0.1); box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+</style>
+
+<script>
+function selectType(radio) {
+    document.querySelectorAll('.type-card-inner').forEach(c => c.classList.remove('selected'));
+    document.getElementById('card-' + radio.value).classList.add('selected');
+}
+</script>
+{% endblock %}

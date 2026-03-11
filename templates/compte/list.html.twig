@@ -1,0 +1,65 @@
+{# templates/compte/list.html.twig #}
+{% extends 'base.html.twig' %}
+{% block title %}Mes Comptes{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Mes Comptes</h1>
+        <p class="page-subtitle">{{ comptes|length }} compte{{ comptes|length > 1 ? 's' : '' }} bancaire{{ comptes|length > 1 ? 's' : '' }}</p>
+    </div>
+    <a href="{{ path('app_comptes_new') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Ouvrir un compte
+    </a>
+</div>
+
+{% if comptes is empty %}
+<div class="empty-state" style="background: #111827; border: 1px solid #1e293b; border-radius: 16px;">
+    <div class="empty-icon"><i class="fas fa-university"></i></div>
+    <div class="empty-title">Aucun compte bancaire</div>
+    <div class="empty-text">Ouvrez votre premier compte pour commencer à gérer vos finances.</div>
+    <a href="{{ path('app_comptes_new') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Ouvrir un compte
+    </a>
+</div>
+{% else %}
+<div class="comptes-grid">
+    {% for compte in comptes %}
+    <div class="compte-card {{ compte.type }}" style="position: relative;">
+        {% if compte.isBloque %}
+        <span class="status-badge status-bloque" style="position: absolute; top: 16px; right: 16px; z-index: 1;">
+            <i class="fas fa-lock"></i> Bloqué
+        </span>
+        {% else %}
+        <span class="status-badge status-actif" style="position: absolute; top: 16px; right: 16px; z-index: 1;">
+            <i class="fas fa-check-circle"></i> Actif
+        </span>
+        {% endif %}
+
+        <div class="badge">
+            <i class="fas fa-{% if compte.type == 'courant' %}credit-card{% elseif compte.type == 'livret_a' %}piggy-bank{% else %}home{% endif %}"></i>
+            {{ compte.typeLabel }}
+        </div>
+
+        <div class="compte-solde">{{ compte.soldeFloat|number_format(2, ',', ' ') }} €</div>
+        <div class="compte-iban" style="margin-bottom: 8px;">{{ compte.iban }}</div>
+        <div style="font-size: 12px; color: #64748b;">Ouvert le {{ compte.createdAt|date('d/m/Y') }}</div>
+
+        <div class="compte-actions" style="margin-top: 20px;">
+            <a href="{{ path('app_comptes_show', {id: compte.id}) }}" class="btn btn-outline btn-sm">
+                <i class="fas fa-eye"></i> Détails
+            </a>
+            {% if compte.isActif %}
+            <a href="{{ path('app_depot', {id: compte.id}) }}" class="btn btn-success btn-sm">
+                <i class="fas fa-arrow-down"></i> Dépôt
+            </a>
+            <a href="{{ path('app_retrait', {id: compte.id}) }}" class="btn btn-warning btn-sm">
+                <i class="fas fa-arrow-up"></i> Retrait
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+{% block title %}Mon Profil{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Mon Profil</h1>
+        <p class="page-subtitle">Gérez vos informations personnelles</p>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; max-width: 900px; align-items: start;">
+    {# SIDEBAR PROFIL #}
+    <div>
+        <div class="card" style="text-align: center; padding: 32px 24px;">
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #6366f1, #4338ca); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; margin: 0 auto 16px; box-shadow: 0 0 30px rgba(99,102,241,0.4);">
+                {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+            </div>
+            <div style="font-size: 18px; font-weight: 700;">{{ user.fullName }}</div>
+            <div style="font-size: 13px; color: #64748b; margin-top: 4px;">{{ user.email }}</div>
+            <div style="margin-top: 12px;">
+                {% if is_granted('ROLE_ADMIN') %}
+                <span class="status-badge" style="background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3);">
+                    <i class="fas fa-crown"></i> Administrateur
+                </span>
+                {% else %}
+                <span class="status-badge status-actif"><i class="fas fa-user"></i> Client</span>
+                {% endif %}
+            </div>
+            <div style="font-size: 12px; color: #64748b; margin-top: 16px;">
+                Membre depuis {{ user.createdAt|date('d/m/Y') }}
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+            <a href="{{ path('app_profil_password') }}" class="btn btn-outline w-full" style="justify-content: center; margin-bottom: 10px;">
+                <i class="fas fa-lock"></i> Changer le mot de passe
+            </a>
+        </div>
+    </div>
+
+    {# FORM #}
+    <div class="form-wrapper" style="max-width: 100%;">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #1e293b;">
+            <i class="fas fa-user-edit" style="color: #6366f1;"></i> Informations personnelles
+        </h3>
+
+        {{ form_start(form) }}
+
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.nom) }}
+                {{ form_widget(form.nom, {attr: {class: 'ib-input'}}) }}
+                {{ form_errors(form.nom) }}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.prenom) }}
+                {{ form_widget(form.prenom, {attr: {class: 'ib-input'}}) }}
+                {{ form_errors(form.prenom) }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.email) }}
+            {{ form_widget(form.email, {attr: {class: 'ib-input'}}) }}
+            {{ form_errors(form.email) }}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.telephone) }}
+                {{ form_widget(form.telephone, {attr: {class: 'ib-input'}}) }}
+                {{ form_errors(form.telephone) }}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.dateNaissance) }}
+                {{ form_widget(form.dateNaissance, {attr: {class: 'ib-input'}}) }}
+                {{ form_errors(form.dateNaissance) }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.adresse) }}
+            {{ form_widget(form.adresse, {attr: {class: 'ib-input'}}) }}
+            {{ form_errors(form.adresse) }}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="justify-content: center; width: 100%;">
+            <i class="fas fa-save"></i> Enregistrer les modifications
+        </button>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+
+<style>
+.ib-input { width: 100%; background: #1a2235; border: 1px solid #2d3a4f; border-radius: 10px; padding: 12px 16px; color: #f8fafc; font-family: 'Sora', sans-serif; font-size: 14px; transition: all 0.25s ease; }
+.ib-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+</style>
+{% endblock %}

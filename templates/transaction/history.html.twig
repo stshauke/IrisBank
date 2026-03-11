@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+{% block title %}Historique{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Historique des transactions</h1>
+        <p class="page-subtitle">{{ transactions|length }} transaction{{ transactions|length > 1 ? 's' : '' }}</p>
+    </div>
+</div>
+
+{% if transactions is empty %}
+<div class="empty-state" style="background: #111827; border: 1px solid #1e293b; border-radius: 16px;">
+    <div class="empty-icon"><i class="fas fa-history"></i></div>
+    <div class="empty-title">Aucune transaction</div>
+    <div class="empty-text">Vos opérations bancaires apparaîtront ici.</div>
+</div>
+{% else %}
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Libellé</th>
+                <th>Compte</th>
+                <th>Date</th>
+                <th style="text-align: right;">Montant</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for tx in transactions %}
+        <tr>
+            <td>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+                         background: {{ tx.isCredit ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)' }};
+                         color: {{ tx.isCredit ? '#6ee7b7' : '#fca5a5' }}; font-size: 14px;">
+                        <i class="fas fa-{% if tx.type == 'depot' %}arrow-down{% elseif tx.type == 'retrait' %}arrow-up{% else %}exchange-alt{% endif %}"></i>
+                    </div>
+                    <span style="font-size: 13px; font-weight: 600; color: {{ tx.isCredit ? '#6ee7b7' : '#fca5a5' }};">{{ tx.typeLabel }}</span>
+                </div>
+            </td>
+            <td style="color: #94a3b8;">{{ tx.libelle ?? '—' }}</td>
+            <td style="font-family: 'Space Mono', monospace; font-size: 11px; color: #64748b;">
+                {% if tx.compteSource %}{{ tx.compteSource.iban|slice(0, 14) }}...{% endif %}
+                {% if tx.compteDestinataire and tx.compteSource %}→{% endif %}
+                {% if tx.compteDestinataire %}{{ tx.compteDestinataire.iban|slice(0, 14) }}...{% endif %}
+            </td>
+            <td style="font-size: 13px; color: #64748b; white-space: nowrap;">{{ tx.createdAt|date('d/m/Y à H:i') }}</td>
+            <td style="text-align: right;" class="{{ tx.isCredit ? 'amount-credit' : 'amount-debit' }}">
+                {{ tx.isCredit ? '+' : '-' }}{{ tx.montantFloat|number_format(2, ',', ' ') }} €
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

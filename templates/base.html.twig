@@ -1,17 +1,131 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}IrisBank{% endblock %} | IrisBank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/irisbank.css') }}">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+{# SIDEBAR NAVIGATION #}
+{% if app.user %}
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">
+            <i class="fas fa-eye"></i>
+        </div>
+        <span class="logo-text">IrisBank</span>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section">
+            <span class="nav-label">Espace Client</span>
+            <a href="{{ path('app_dashboard') }}" class="nav-item {% if app.request.attributes.get('_route') == 'app_dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>Tableau de bord</span>
+            </a>
+            <a href="{{ path('app_comptes_list') }}" class="nav-item {% if 'app_comptes' in app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-credit-card"></i>
+                <span>Mes Comptes</span>
+            </a>
+            <a href="{{ path('app_transactions_history') }}" class="nav-item {% if 'app_transactions' in app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Historique</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-label">Opérations</span>
+            <a href="{{ path('app_virement') }}" class="nav-item">
+                <i class="fas fa-paper-plane"></i>
+                <span>Virement</span>
+            </a>
+        </div>
+
+        {% if is_granted('ROLE_ADMIN') %}
+        <div class="nav-section">
+            <span class="nav-label">Administration</span>
+            <a href="{{ path('admin_dashboard') }}" class="nav-item admin-nav {% if 'admin_dashboard' == app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard Admin</span>
+            </a>
+            <a href="{{ path('admin_clients') }}" class="nav-item admin-nav {% if 'admin_clients' in app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-users"></i>
+                <span>Clients</span>
+            </a>
+            <a href="{{ path('admin_comptes') }}" class="nav-item admin-nav {% if 'admin_comptes' == app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-university"></i>
+                <span>Comptes</span>
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="nav-section nav-bottom">
+            <a href="{{ path('app_profil') }}" class="nav-item {% if 'app_profil' in app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-user-cog"></i>
+                <span>Mon Profil</span>
+            </a>
+            <a href="{{ path('app_logout') }}" class="nav-item nav-logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Déconnexion</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="sidebar-user">
+        <div class="user-avatar">{{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}</div>
+        <div class="user-info">
+            <span class="user-name">{{ app.user.fullName }}</span>
+            <span class="user-role">{% if is_granted('ROLE_ADMIN') %}Administrateur{% else %}Client{% endif %}</span>
+        </div>
+    </div>
+</div>
+
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div class="main-content" id="mainContent">
+{% else %}
+<div class="auth-wrapper">
+{% endif %}
+
+    {# FLASH MESSAGES #}
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+        <div class="flash flash-{{ type }}">
+            <i class="fas fa-{% if type == 'success' %}check-circle{% elseif type == 'error' %}exclamation-circle{% elseif type == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+            {{ message }}
+            <button class="flash-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+        </div>
+        {% endfor %}
+    {% endfor %}
+
+    {% block body %}{% endblock %}
+
+{% if app.user %}
+</div>
+{% else %}
+</div>
+{% endif %}
+
+<script>
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+    document.getElementById('mainContent').classList.toggle('expanded');
+}
+
+// Auto-hide flash messages
+document.querySelectorAll('.flash').forEach(flash => {
+    setTimeout(() => { flash.style.opacity = '0'; setTimeout(() => flash.remove(), 300); }, 5000);
+});
+</script>
+{% block javascripts %}{% endblock %}
+</body>
 </html>
