@@ -28,17 +28,15 @@
         {% for compte in comptes %}
         <tr>
             <td>
-                <a href="{{ path('admin_client_show', {id: compte.user.id}) }}" style="text-decoration: none; color: #f8fafc; font-weight: 600; font-size: 14px;">
+                <a href="{{ path('admin_client_show', {id: compte.user.id}) }}" style="text-decoration: none; font-weight: 600; font-size: 14px; color: var(--text-1);">
                     {{ compte.user.fullName }}
                 </a>
             </td>
-            <td style="font-family: 'Space Mono', monospace; font-size: 11px; color: #64748b;">{{ compte.iban }}</td>
+            <td style="font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-3);">{{ compte.iban }}</td>
             <td>
-                <span style="background: rgba(99,102,241,0.15); color: #818cf8; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">
-                    {{ compte.typeLabel }}
-                </span>
+                <span class="count-badge">{{ compte.typeLabel }}</span>
             </td>
-            <td style="font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: {{ compte.soldeFloat >= 0 ? '#6ee7b7' : '#fca5a5' }};">
+            <td style="font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700;" class="{{ compte.soldeFloat >= 0 ? 'amount-positive' : 'amount-negative' }}">
                 {{ compte.soldeFloat|number_format(2, ',', ' ') }} €
             </td>
             <td>
@@ -47,7 +45,7 @@
                     {{ compte.isActif ? 'Actif' : 'Bloqué' }}
                 </span>
             </td>
-            <td style="font-size: 13px; color: #64748b;">{{ compte.createdAt|date('d/m/Y') }}</td>
+            <td class="muted-cell">{{ compte.createdAt|date('d/m/Y') }}</td>
             <td>
                 <div style="display: flex; gap: 6px;">
                     <form method="post" action="{{ path('admin_compte_toggle', {id: compte.id}) }}">

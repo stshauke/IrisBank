@@ -1,10 +1,5 @@
 <?php
-// ============================================================
-// src/Controller/CompteController.php
-//
-// ⚠️  UN CLIENT NE PEUT PAS SUPPRIMER SES COMPTES.
-//     La suppression est réservée à l'administrateur.
-// ============================================================
+
 namespace App\Controller;
 
 use App\Entity\CompteBancaire;
@@ -20,64 +15,76 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/comptes')]
 class CompteController extends AbstractController
 {
-    // ──────────────────────────────────────────
-    //  LISTE DES COMPTES
-    // ──────────────────────────────────────────
-    #[Route('/', name: 'app_comptes_list')]
+    #[Route('/', name: 'app_comptes_list', methods: ['GET'])]
     public function list(): Response
     {
+        $user = $this->getUser();
+
         return $this->render('compte/list.html.twig', [
-            'comptes' => $this->getUser()->getComptesBancaires(),
+            'comptes' => $user->getComptesBancaires(),
         ]);
     }
 
-    // ──────────────────────────────────────────
-    //  CRÉER UN NOUVEAU COMPTE
-    // ──────────────────────────────────────────
-    #[Route('/nouveau', name: 'app_comptes_new')]
+    #[Route('/nouveau', name: 'app_comptes_new', methods: ['GET', 'POST'])]
     public function new(Request $request, BanqueService $banqueService): Response
     {
         $form = $this->createForm(CompteType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $type   = $form->get('type')->getData();
-            $compte = $banqueService->creerCompte($this->getUser(), $type);
-            $this->addFlash('success', '✅ Compte ' . $compte->getTypeLabel() . ' créé avec succès !');
-            return $this->redirectToRoute('app_comptes_show', ['id' => $compte->getId()]);
+            try {
+                $type = (string) $form->get('type')->getData();
+                $compte = $banqueService->creerCompte($this->getUser(), $type);
+
+                $this->addFlash('success', '✅ Compte ' . $compte->getTypeLabel() . ' créé avec succès !');
+
+                return $this->redirectToRoute('app_comptes_show', ['id' => $compte->getId()]);
+            } catch (\Throwable $e) {
+                $this->addFlash('error', $e->getMessage());
+            }
         }
 
-        return $this->render('compte/new.html.twig', ['form' => $form]);
+        return $this->render('compte/new.html.twig', [
+            'form' => $form,
+        ]);
     }
 
-    // ──────────────────────────────────────────
-    //  DÉTAIL D'UN COMPTE
-    // ──────────────────────────────────────────
-    #[Route('/{id}', name: 'app_comptes_show')]
+    #[Route('/{id}', name: 'app_comptes_show', methods: ['GET'])]
     public function show(CompteBancaire $compte): Response
     {
         $this->checkOwnership($compte);
 
         return $this->render('compte/show.html.twig', [
-            'compte'       => $compte,
+            'compte' => $compte,
             'transactions' => $compte->getAllTransactions(),
         ]);
     }
 
-    // ──────────────────────────────────────────
-    //  ❌ SUPPRESSION RETIRÉE CÔTÉ CLIENT
-    //  La suppression d'un compte est uniquement
-    //  possible par un administrateur depuis
-    //  /admin/clients/{id}
-    // ──────────────────────────────────────────
+    #[Route('/{id}/supprimer', name: 'app_comptes_delete', methods: ['POST'])]
+    public function delete(CompteBancaire $compte, BanqueService $banqueService, Request $request): Response
+    {
+        $this->checkOwnership($compte);
 
-    // ──────────────────────────────────────────
-    //  MÉTHODE PRIVÉE : vérifier le propriétaire
-    // ──────────────────────────────────────────
+        if (!$this->isCsrfTokenValid('delete_compte_' . $compte->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+
+            return $this->redirectToRoute('app_comptes_list');
+        }
+
+        try {
+            $banqueService->supprimerCompte($compte);
+            $this->addFlash('success', '🗑️ Compte supprimé avec succès.');
+        } catch (\Throwable $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
+
+        return $this->redirectToRoute('app_comptes_list');
+    }
+
     private function checkOwnership(CompteBancaire $compte): void
     {
         if ($compte->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Vous n\'avez pas accès à ce compte.');
+            throw $this->createAccessDeniedException('Accès refusé à ce compte.');
         }
     }
 }

@@ -2,167 +2,146 @@
 {% block title %}Tableau de bord{% endblock %}
 
 {% block body %}
-
-{# ── En-tête ── #}
 <div class="page-header">
     <div>
         <h1 class="page-title">Bonjour, {{ user.prenom }} 👋</h1>
-        {# Date en français : ex "Mardi 01 avril 2026" #}
-        <p class="page-subtitle">
-            {% set jours = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'] %}
-            {% set mois  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'] %}
-            {{ jours["now"|date("w")] }}
-            {{ "now"|date("d") }}
-            {{ mois["now"|date("n") - 1] }}
-            {{ "now"|date("Y") }}
-            &nbsp;—&nbsp; Voici un aperçu de vos finances
-        </p>
+        <p class="page-subtitle">{{ todayLabel }} — Voici un aperçu de vos finances</p>
     </div>
     <a href="{{ path('app_comptes_new') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nouveau compte
     </a>
 </div>
 
-{# ── Statistiques ── #}
 <div class="stats-grid">
-    <div class="stat-card" style="--accent-color: #4f46e5;">
-        <div class="stat-icon" style="background:#ede9fe; color:#4f46e5;">
+    <div class="stat-card" style="--accent-color: var(--iris);">
+        <div class="stat-icon">
             <i class="fas fa-wallet"></i>
         </div>
         <div class="stat-value">{{ soldeTotal|number_format(2, ',', ' ') }} €</div>
         <div class="stat-label">Solde total</div>
     </div>
 
-    <div class="stat-card" style="--accent-color: #059669;">
-        <div class="stat-icon" style="background:#d1fae5; color:#059669;">
+    <div class="stat-card stat-card-success" style="--accent-color: var(--green);">
+        <div class="stat-icon">
             <i class="fas fa-university"></i>
         </div>
         <div class="stat-value">{{ comptes|length }}</div>
         <div class="stat-label">Compte{{ comptes|length > 1 ? 's' : '' }} bancaire{{ comptes|length > 1 ? 's' : '' }}</div>
     </div>
 
-    <div class="stat-card" style="--accent-color: #d97706;">
-        <div class="stat-icon" style="background:#fef3c7; color:#d97706;">
+    <div class="stat-card stat-card-warning" style="--accent-color: var(--gold);">
+        <div class="stat-icon">
             <i class="fas fa-exchange-alt"></i>
         </div>
         <div class="stat-value">{{ dernieresTransactions|length }}</div>
-        <div class="stat-label">Transactions récentes</div>
+        <div class="stat-label">Dernières transactions</div>
     </div>
 </div>
 
-{# ── Contenu principal ── #}
 <div class="dashboard-grid">
-
-    {# COLONNE GAUCHE : Comptes #}
     <div>
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-            <h2 style="font-size:16px; font-weight:700; color:var(--t1);">Mes comptes</h2>
+        <div class="section-head">
+            <h2 class="card-title">Mes comptes</h2>
             <a href="{{ path('app_comptes_list') }}" class="btn btn-outline btn-sm">Voir tous</a>
         </div>
 
         {% if comptes is empty %}
-        <div class="empty-state" style="background:white; border:1px solid var(--border); border-radius:var(--r);">
-            <div class="empty-icon"><i class="fas fa-university"></i></div>
-            <div class="empty-title">Aucun compte bancaire</div>
-            <div class="empty-text">Ouvrez votre premier compte pour commencer</div>
-            <a href="{{ path('app_comptes_new') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Ouvrir un compte
-            </a>
-        </div>
-        {% else %}
-        <div class="comptes-grid">
-            {% for compte in comptes %}
-            <a href="{{ path('app_comptes_show', {id: compte.id}) }}" style="text-decoration:none;">
-                <div class="compte-card {{ compte.type }}">
-                    {% if compte.isBloque %}
-                    <span class="status-badge status-bloque" style="position:absolute; top:14px; right:14px;">
-                        <i class="fas fa-lock"></i> Bloqué
-                    </span>
-                    {% endif %}
-
-                    <div class="badge">
-                        <i class="fas fa-{% if compte.type == 'courant' %}credit-card{% elseif compte.type == 'livret_a' %}piggy-bank{% else %}home{% endif %}"></i>
-                        {{ compte.typeLabel }}
-                    </div>
-
-                    <div class="compte-solde">{{ compte.soldeFloat|number_format(2, ',', ' ') }} €</div>
-                    <div class="compte-iban">{{ compte.iban }}</div>
-
-                    <div class="compte-actions" style="margin-top:16px;">
-                        {% if compte.isActif %}
-                        <a href="{{ path('app_depot', {id: compte.id}) }}"
-                           class="btn btn-success btn-sm" onclick="event.stopPropagation()">
-                            <i class="fas fa-arrow-down"></i> Dépôt
-                        </a>
-                        <a href="{{ path('app_retrait', {id: compte.id}) }}"
-                           class="btn btn-warning btn-sm" onclick="event.stopPropagation()">
-                            <i class="fas fa-arrow-up"></i> Retrait
-                        </a>
-                        {% else %}
-                        <span style="font-size:12px; color:rgba(255,255,255,.6);">
-                            <i class="fas fa-lock"></i> Compte bloqué
-                        </span>
-                        {% endif %}
-                    </div>
+            <div class="card empty-card">
+                <div class="empty-state empty-state-compact">
+                    <div class="empty-icon"><i class="fas fa-university"></i></div>
+                    <div class="empty-title">Aucun compte</div>
+                    <div class="empty-text">Ouvrez votre premier compte bancaire maintenant</div>
+                    <a href="{{ path('app_comptes_new') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Ouvrir un compte
+                    </a>
                 </div>
-            </a>
-            {% endfor %}
-        </div>
+            </div>
+        {% else %}
+            <div class="comptes-grid">
+                {% for compte in comptes %}
+                    <a href="{{ path('app_comptes_show', {id: compte.id}) }}" class="card-link">
+                        <div class="compte-card {{ compte.type }}">
+                            <div class="badge">
+                                <i class="fas fa-{% if compte.type == 'courant' %}credit-card{% elseif compte.type == 'livret_a' %}piggy-bank{% else %}home{% endif %}"></i>
+                                {{ compte.typeLabel }}
+                            </div>
+
+                            {% if compte.isBloque %}
+                                <span class="status-badge status-bloque status-badge-float">
+                                    <i class="fas fa-lock"></i> Bloqué
+                                </span>
+                            {% endif %}
+
+                            <div class="compte-solde">{{ compte.soldeFloat|number_format(2, ',', ' ') }} €</div>
+                            <div class="compte-iban">{{ compte.iban }}</div>
+
+                            <div class="compte-actions">
+                                {% if compte.isActif %}
+                                    <a href="{{ path('app_depot', {id: compte.id}) }}" class="btn btn-success btn-sm" onclick="event.stopPropagation()">
+                                        <i class="fas fa-arrow-down"></i> Dépôt
+                                    </a>
+                                    <a href="{{ path('app_retrait', {id: compte.id}) }}" class="btn btn-warning btn-sm" onclick="event.stopPropagation()">
+                                        <i class="fas fa-arrow-up"></i> Retrait
+                                    </a>
+                                {% else %}
+                                    <span class="inline-note inline-note-danger">
+                                        <i class="fas fa-lock"></i> Compte bloqué
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
         {% endif %}
     </div>
 
-    {# COLONNE DROITE : Activité + Accès rapide #}
     <div>
-
-        {# Transactions récentes #}
-        <div class="card" style="margin-bottom:18px;">
+        <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Activité récente</h3>
-                <a href="{{ path('app_transactions_history') }}" class="btn btn-outline btn-sm">Tout voir</a>
+                <h2 class="card-title">Activité récente</h2>
+                <a href="{{ path('app_transactions_history') }}" class="btn btn-outline btn-sm">Historique</a>
             </div>
 
             {% if dernieresTransactions is empty %}
-            <div style="padding:24px; text-align:center; color:var(--t3); font-size:13px;">
-                <i class="fas fa-history" style="font-size:28px; opacity:.3; display:block; margin-bottom:8px;"></i>
-                Aucune transaction
-            </div>
+                <div class="empty-state empty-state-compact">
+                    <div class="empty-icon empty-icon-sm"><i class="fas fa-history"></i></div>
+                    <div class="empty-text empty-text-no-margin">Aucune transaction récente</div>
+                </div>
             {% else %}
-            {% for tx in dernieresTransactions %}
-            <div class="tx-item">
-                <div class="tx-icon {{ tx.isCredit ? 'credit' : 'debit' }}">
-                    <i class="fas fa-{% if tx.type == 'depot' %}arrow-down{% elseif tx.type == 'retrait' %}arrow-up{% else %}exchange-alt{% endif %}"></i>
-                </div>
-                <div class="tx-info">
-                    <div class="tx-label">{{ tx.libelle ?? tx.typeLabel }}</div>
-                    <div class="tx-date">{{ tx.createdAt|date('d/m/Y à H:i') }}</div>
-                </div>
-                <div class="tx-amount {{ tx.isCredit ? 'amount-credit' : 'amount-debit' }}">
-                    {{ tx.isCredit ? '+' : '−' }}{{ tx.montantFloat|number_format(2, ',', ' ') }} €
-                </div>
-            </div>
-            {% endfor %}
+                {% for tx in dernieresTransactions %}
+                    <div class="tx-item">
+                        <div class="tx-icon {{ tx.isCredit ? 'credit' : 'debit' }}">
+                            <i class="fas fa-{% if tx.type == 'depot' %}arrow-down{% elseif tx.type == 'retrait' %}arrow-up{% else %}exchange-alt{% endif %}"></i>
+                        </div>
+                        <div class="tx-info">
+                            <div class="tx-label">{{ tx.libelle ?? tx.typeLabel }}</div>
+                            <div class="tx-date">{{ tx.createdAt|date('d/m/Y à H:i') }}</div>
+                        </div>
+                        <div class="tx-amount {{ tx.isCredit ? 'amount-credit' : 'amount-debit' }}">
+                            {{ tx.isCredit ? '+' : '-' }}{{ tx.montantFloat|number_format(2, ',', ' ') }} €
+                        </div>
+                    </div>
+                {% endfor %}
             {% endif %}
         </div>
 
-        {# Accès rapide #}
-        <div class="card">
+        <div class="card card-stack-top">
             <div class="card-header">
-                <h3 class="card-title">Accès rapide</h3>
+                <h2 class="card-title">Accès rapide</h2>
             </div>
-            <div style="display:flex; flex-direction:column; gap:9px;">
-                <a href="{{ path('app_virement') }}" class="btn btn-outline" style="justify-content:flex-start;">
-                    <i class="fas fa-paper-plane" style="color:var(--iris);"></i> Effectuer un virement
+            <div class="quick-links">
+                <a href="{{ path('app_virement') }}" class="btn btn-outline quick-link">
+                    <i class="fas fa-paper-plane quick-link-icon quick-link-icon-iris"></i> Effectuer un virement
                 </a>
-                <a href="{{ path('app_comptes_new') }}" class="btn btn-outline" style="justify-content:flex-start;">
-                    <i class="fas fa-plus" style="color:#059669;"></i> Ouvrir un nouveau compte
+                <a href="{{ path('app_profil') }}" class="btn btn-outline quick-link">
+                    <i class="fas fa-user-cog quick-link-icon quick-link-icon-iris"></i> Mon profil
                 </a>
-                <a href="{{ path('app_profil') }}" class="btn btn-outline" style="justify-content:flex-start;">
-                    <i class="fas fa-user-cog" style="color:var(--iris);"></i> Mon profil
+                <a href="{{ path('app_comptes_new') }}" class="btn btn-outline quick-link">
+                    <i class="fas fa-plus quick-link-icon quick-link-icon-green"></i> Ouvrir un nouveau compte
                 </a>
             </div>
         </div>
-
     </div>
 </div>
-
 {% endblock %}

@@ -14,7 +14,7 @@
 </div>
 
 {% if comptes is empty %}
-<div class="empty-state" style="background: #111827; border: 1px solid #1e293b; border-radius: 16px;">
+<div class="empty-state empty-state-card">
     <div class="empty-icon"><i class="fas fa-university"></i></div>
     <div class="empty-title">Aucun compte bancaire</div>
     <div class="empty-text">Ouvrez votre premier compte pour commencer à gérer vos finances.</div>
@@ -27,11 +27,11 @@
     {% for compte in comptes %}
     <div class="compte-card {{ compte.type }}" style="position: relative;">
         {% if compte.isBloque %}
-        <span class="status-badge status-bloque" style="position: absolute; top: 16px; right: 16px; z-index: 1;">
+        <span class="status-badge status-bloque status-badge-float">
             <i class="fas fa-lock"></i> Bloqué
         </span>
         {% else %}
-        <span class="status-badge status-actif" style="position: absolute; top: 16px; right: 16px; z-index: 1;">
+        <span class="status-badge status-actif status-badge-float">
             <i class="fas fa-check-circle"></i> Actif
         </span>
         {% endif %}
@@ -43,9 +43,9 @@
 
         <div class="compte-solde">{{ compte.soldeFloat|number_format(2, ',', ' ') }} €</div>
         <div class="compte-iban" style="margin-bottom: 8px;">{{ compte.iban }}</div>
-        <div style="font-size: 12px; color: #64748b;">Ouvert le {{ compte.createdAt|date('d/m/Y') }}</div>
+        <div style="font-size: 12px; color: var(--text-3);">Ouvert le {{ compte.createdAt|date('d/m/Y') }}</div>
 
-        <div class="compte-actions" style="margin-top: 20px;">
+        <div class="compte-actions">
             <a href="{{ path('app_comptes_show', {id: compte.id}) }}" class="btn btn-outline btn-sm">
                 <i class="fas fa-eye"></i> Détails
             </a>

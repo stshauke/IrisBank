@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,637 +8,80 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        /* ============================================================
-           IRISBANK — THÈME CLAIR
-        ============================================================ */
-        :root {
-            /* Couleurs principales */
-            --iris:       #4f46e5;
-            --iris-l:     #6366f1;
-            --iris-d:     #3730a3;
-            --gold:       #d97706;
-            --gold-l:     #f59e0b;
-            --green:      #059669;
-            --red:        #dc2626;
-
-            /* Thème CLAIR */
-            --bg:         #f1f5f9;
-            --bg2:        #e2e8f0;
-            --sidebar-bg: #1e1b4b;   /* sidebar reste sombre pour le contraste */
-            --sidebar-bg2:#2d2a6e;
-            --card:       #ffffff;
-            --card2:      #f8fafc;
-
-            /* Textes */
-            --t1:         #0f172a;
-            --t2:         #475569;
-            --t3:         #94a3b8;
-
-            /* Bordures */
-            --border:     #e2e8f0;
-            --border2:    #cbd5e1;
-
-            /* Sidebar textes */
-            --s-t1:       #f1f5f9;
-            --s-t2:       #a5b4fc;
-            --s-t3:       #818cf8;
-
-            /* Misc */
-            --sw:         260px;
-            --r:          14px;
-            --rsm:        10px;
-            --shadow:     0 2px 12px rgba(0,0,0,.08);
-            --shadow-lg:  0 8px 32px rgba(0,0,0,.12);
-            --tr:         all .22s cubic-bezier(.4,0,.2,1);
-        }
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { font-size: 16px; scroll-behavior: smooth; }
-        body {
-            font-family: 'Sora', sans-serif;
-            background: var(--bg);
-            color: var(--t1);
-            min-height: 100vh;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ══════════════════════════════════════
-           SIDEBAR  (reste sombre pour le contraste)
-        ══════════════════════════════════════ */
-        .sidebar {
-            position: fixed; top: 0; left: 0;
-            width: var(--sw); height: 100vh;
-            background: var(--sidebar-bg);
-            display: flex; flex-direction: column;
-            z-index: 100;
-            transition: var(--tr);
-            overflow: hidden;
-            box-shadow: 4px 0 24px rgba(0,0,0,.15);
-        }
-        .sidebar.collapsed { width: 72px; }
-
-        .sidebar-logo {
-            display: flex; align-items: center; gap: 12px;
-            padding: 22px 20px;
-            border-bottom: 1px solid rgba(255,255,255,.1);
-        }
-        .logo-icon {
-            width: 40px; height: 40px;
-            background: linear-gradient(135deg, var(--iris-l), var(--iris-d));
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; color: white;
-            flex-shrink: 0;
-            box-shadow: 0 0 20px rgba(99,102,241,.5);
-        }
-        .logo-text {
-            font-size: 20px; font-weight: 800;
-            color: white;
-            white-space: nowrap;
-            transition: var(--tr);
-        }
-        .sidebar.collapsed .logo-text { opacity: 0; width: 0; }
-
-        .sidebar-nav {
-            flex: 1; padding: 16px 10px;
-            overflow-y: auto;
-            display: flex; flex-direction: column; gap: 2px;
-        }
-        .sidebar-nav::-webkit-scrollbar { width: 3px; }
-        .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 2px; }
-
-        .nav-section { margin-bottom: 6px; }
-        .nav-label {
-            font-size: 10px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: .1em;
-            color: rgba(255,255,255,.35);
-            padding: 10px 10px 4px;
-            display: block; white-space: nowrap;
-            transition: var(--tr);
-        }
-        .sidebar.collapsed .nav-label { opacity: 0; height: 0; overflow: hidden; padding: 0; margin: 0; }
-
-        .nav-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 12px;
-            border-radius: var(--rsm);
-            color: rgba(255,255,255,.6);
-            text-decoration: none;
-            font-size: 13.5px; font-weight: 500;
-            transition: var(--tr);
-            white-space: nowrap;
-            border: 1px solid transparent;
-        }
-        .nav-item i { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
-        .nav-item span { transition: var(--tr); }
-        .sidebar.collapsed .nav-item span { opacity: 0; width: 0; overflow: hidden; }
-
-        .nav-item:hover { color: white; background: rgba(255,255,255,.1); }
-        .nav-item.active {
-            background: rgba(99,102,241,.3);
-            color: white;
-            border-color: rgba(99,102,241,.5);
-        }
-
-        /* Admin nav items — couleur or */
-        .nav-item.admin-nav { color: rgba(252,211,77,.8); }
-        .nav-item.admin-nav:hover { color: #fcd34d; background: rgba(245,158,11,.15); }
-        .nav-item.admin-nav.active { background: rgba(245,158,11,.2); border-color: rgba(245,158,11,.4); color: #fcd34d; }
-
-        /* Logout */
-        .nav-item.nav-logout { color: rgba(252,165,165,.7); margin-top: 4px; }
-        .nav-item.nav-logout:hover { background: rgba(239,68,68,.15); color: #fca5a5; }
-
-        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,.1); padding-top: 10px; }
-
-        /* Séparateur de section */
-        .nav-separator {
-            height: 1px;
-            background: rgba(255,255,255,.08);
-            margin: 8px 10px;
-        }
-
-        /* User info en bas */
-        .sidebar-user {
-            display: flex; align-items: center; gap: 10px;
-            padding: 14px 18px;
-            border-top: 1px solid rgba(255,255,255,.1);
-            background: rgba(0,0,0,.2);
-        }
-        .user-avatar {
-            width: 34px; height: 34px;
-            background: linear-gradient(135deg, var(--iris-l), var(--iris-d));
-            border-radius: 9px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 700; color: white;
-            flex-shrink: 0;
-        }
-        .user-info { overflow: hidden; transition: var(--tr); }
-        .sidebar.collapsed .user-info { opacity: 0; width: 0; }
-        .user-name { display: block; font-size: 13px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-role { display: block; font-size: 11px; color: var(--s-t2); }
-
-        /* Bouton toggle sidebar */
-        .sidebar-toggle {
-            position: fixed; top: 20px; left: 216px;
-            width: 30px; height: 30px;
-            background: var(--iris);
-            border: none; border-radius: 50%;
-            color: white; cursor: pointer;
-            z-index: 101;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px;
-            transition: var(--tr);
-            box-shadow: 0 2px 10px rgba(79,70,229,.4);
-        }
-        .sidebar.collapsed ~ .sidebar-toggle { left: 50px; }
-
-        /* ══════════════════════════════════════
-           CONTENU PRINCIPAL
-        ══════════════════════════════════════ */
-        .main-content {
-            margin-left: var(--sw);
-            min-height: 100vh;
-            padding: 32px;
-            transition: var(--tr);
-        }
-        .main-content.expanded { margin-left: 72px; }
-
-        /* Page de connexion / inscription : pas de sidebar */
-        .auth-wrapper {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #f0f4ff 100%);
-            display: flex; align-items: center; justify-content: center;
-            padding: 32px;
-            position: relative;
-            overflow: hidden;
-        }
-        .auth-wrapper::before {
-            content: '';
-            position: absolute; top: -150px; left: -150px;
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(79,70,229,.12) 0%, transparent 70%);
-            border-radius: 50%; pointer-events: none;
-        }
-        .auth-wrapper::after {
-            content: '';
-            position: absolute; bottom: -150px; right: -150px;
-            width: 400px; height: 400px;
-            background: radial-gradient(circle, rgba(217,119,6,.08) 0%, transparent 70%);
-            border-radius: 50%; pointer-events: none;
-        }
-
-        /* ══════════════════════════════════════
-           FLASH MESSAGES
-        ══════════════════════════════════════ */
-        .flash {
-            display: flex; align-items: center; gap: 12px;
-            padding: 13px 18px;
-            border-radius: var(--rsm);
-            margin-bottom: 18px;
-            font-size: 14px; font-weight: 500;
-            position: relative;
-            animation: slideIn .3s ease;
-            transition: opacity .3s;
-        }
-        @keyframes slideIn { from { transform: translateY(-8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .flash-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
-        .flash-error   { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
-        .flash-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
-        .flash-info    { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
-        .flash-close   { position: absolute; right: 12px; background: none; border: none; color: inherit; cursor: pointer; font-size: 12px; opacity: .6; }
-
-        /* ══════════════════════════════════════
-           PAGE HEADER
-        ══════════════════════════════════════ */
-        .page-header {
-            margin-bottom: 28px;
-            display: flex; align-items: flex-start;
-            justify-content: space-between;
-            flex-wrap: wrap; gap: 16px;
-        }
-        .page-title   { font-size: 26px; font-weight: 800; color: var(--t1); }
-        .page-subtitle { font-size: 14px; color: var(--t2); margin-top: 4px; }
-
-        /* ══════════════════════════════════════
-           CARDS
-        ══════════════════════════════════════ */
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--r);
-            padding: 24px;
-            transition: var(--tr);
-            box-shadow: var(--shadow);
-        }
-        .card:hover { border-color: var(--border2); box-shadow: var(--shadow-lg); }
-        .card-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 18px; padding-bottom: 14px;
-            border-bottom: 1px solid var(--border);
-        }
-        .card-title { font-size: 15px; font-weight: 700; color: var(--t1); }
-
-        /* ══════════════════════════════════════
-           STAT CARDS
-        ══════════════════════════════════════ */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 18px;
-            margin-bottom: 28px;
-        }
-        .stat-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--r);
-            padding: 22px;
-            position: relative; overflow: hidden;
-            transition: var(--tr);
-            box-shadow: var(--shadow);
-        }
-        .stat-card::before {
-            content: '';
-            position: absolute; top: 0; right: 0;
-            width: 80px; height: 80px;
-            background: radial-gradient(circle, var(--accent-color, var(--iris)) 0%, transparent 70%);
-            opacity: .08;
-            border-radius: 0 var(--r) 0 50%;
-        }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--border2); }
-        .stat-icon {
-            width: 42px; height: 42px;
-            background: rgba(79,70,229,.1);
-            border-radius: 11px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px;
-            margin-bottom: 14px;
-            color: var(--accent-color, var(--iris));
-        }
-        .stat-value { font-size: 26px; font-weight: 800; font-family: 'Space Mono', monospace; color: var(--t1); }
-        .stat-label { font-size: 13px; color: var(--t2); margin-top: 4px; }
-
-        /* ══════════════════════════════════════
-           COMPTE CARDS (reste coloré pour le visuel)
-        ══════════════════════════════════════ */
-        .compte-card {
-            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-            border: 1px solid rgba(255,255,255,.1);
-            border-radius: var(--r);
-            padding: 24px;
-            position: relative; overflow: hidden;
-            transition: var(--tr);
-            color: white;
-        }
-        .compte-card.livret_a { background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); }
-        .compte-card.pel      { background: linear-gradient(135deg, #78350f 0%, #92400e 100%); }
-        .compte-card::after {
-            content: '';
-            position: absolute; bottom: -20px; right: -20px;
-            width: 100px; height: 100px;
-            background: rgba(255,255,255,.05);
-            border-radius: 50%;
-        }
-        .compte-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,.2); }
-        .compte-card .badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 4px 12px;
-            background: rgba(255,255,255,.15);
-            border-radius: 20px;
-            font-size: 12px; font-weight: 600;
-            color: white;
-            border: 1px solid rgba(255,255,255,.2);
-            margin-bottom: 16px;
-        }
-        .compte-solde { font-size: 30px; font-weight: 800; font-family: 'Space Mono', monospace; margin: 14px 0 8px; color: white; }
-        .compte-iban  { font-family: 'Space Mono', monospace; font-size: 10px; color: rgba(255,255,255,.6); letter-spacing: .04em; word-break: break-all; }
-        .compte-actions { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
-
-        /* ══════════════════════════════════════
-           STATUS BADGES
-        ══════════════════════════════════════ */
-        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .status-actif  { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-        .status-bloque { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-
-        /* ══════════════════════════════════════
-           BUTTONS
-        ══════════════════════════════════════ */
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 9px 18px;
-            border-radius: var(--rsm);
-            font-family: 'Sora', sans-serif;
-            font-size: 13.5px; font-weight: 600;
-            cursor: pointer; border: none;
-            text-decoration: none;
-            transition: var(--tr); white-space: nowrap;
-        }
-        .btn-primary  { background: linear-gradient(135deg, var(--iris-l), var(--iris-d)); color: white; box-shadow: 0 3px 12px rgba(79,70,229,.3); }
-        .btn-primary:hover  { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,70,229,.4); }
-        .btn-success  { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 3px 12px rgba(16,185,129,.3); }
-        .btn-success:hover  { transform: translateY(-1px); }
-        .btn-warning  { background: linear-gradient(135deg, var(--gold-l), var(--gold)); color: white; box-shadow: 0 3px 12px rgba(217,119,6,.3); }
-        .btn-warning:hover  { transform: translateY(-1px); }
-        .btn-danger   { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; box-shadow: 0 3px 12px rgba(220,38,38,.3); }
-        .btn-danger:hover   { transform: translateY(-1px); }
-        .btn-outline  { background: white; color: var(--t2); border: 1px solid var(--border2); }
-        .btn-outline:hover  { border-color: var(--iris); color: var(--iris); background: #f5f3ff; }
-        .btn-sm  { padding: 5px 12px; font-size: 12px; }
-        .btn-lg  { padding: 13px 26px; font-size: 15px; }
-        .w-full  { width: 100%; justify-content: center; }
-
-        /* ══════════════════════════════════════
-           TABLE
-        ══════════════════════════════════════ */
-        .table-container {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--r);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-        table { width: 100%; border-collapse: collapse; }
-        thead th {
-            background: #f8fafc;
-            padding: 12px 16px;
-            text-align: left;
-            font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: .05em;
-            color: var(--t2);
-            border-bottom: 1px solid var(--border);
-        }
-        tbody tr { border-bottom: 1px solid var(--border); transition: var(--tr); }
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #f8fafc; }
-        tbody td { padding: 13px 16px; font-size: 13.5px; color: var(--t2); }
-
-        .amount-credit { color: #059669; font-family: 'Space Mono', monospace; font-weight: 700; }
-        .amount-debit  { color: #dc2626; font-family: 'Space Mono', monospace; font-weight: 700; }
-
-        /* ══════════════════════════════════════
-           FORMS
-        ══════════════════════════════════════ */
-        .form-wrapper {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--r);
-            padding: 28px;
-            box-shadow: var(--shadow);
-        }
-        .form-group { margin-bottom: 18px; }
-        .form-group label {
-            display: block;
-            font-size: 12px; font-weight: 700;
-            color: var(--t2);
-            margin-bottom: 7px;
-            text-transform: uppercase; letter-spacing: .05em;
-        }
-        .ib-input {
-            width: 100%;
-            background: #f8fafc;
-            border: 1.5px solid var(--border2);
-            border-radius: var(--rsm);
-            padding: 11px 14px;
-            color: var(--t1);
-            font-family: 'Sora', sans-serif;
-            font-size: 14px;
-            transition: var(--tr);
-            appearance: none;
-        }
-        .ib-input:focus {
-            outline: none;
-            border-color: var(--iris);
-            box-shadow: 0 0 0 3px rgba(79,70,229,.12);
-            background: white;
-        }
-        .ib-input::placeholder { color: var(--t3); }
-
-        /* Erreurs Symfony */
-        .form-group ul { list-style: none; padding: 0; margin-top: 5px; }
-        .form-group ul li { color: #dc2626; font-size: 12px; }
-
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .divider   { height: 1px; background: var(--border); margin: 20px 0; }
-
-        /* ══════════════════════════════════════
-           TX ITEMS
-        ══════════════════════════════════════ */
-        .tx-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 13px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .tx-item:last-child { border-bottom: none; }
-        .tx-item:hover { background: transparent; }
-        .tx-icon {
-            width: 38px; height: 38px;
-            border-radius: 11px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 15px; flex-shrink: 0;
-        }
-        .tx-icon.credit { background: #f0fdf4; color: #059669; }
-        .tx-icon.debit  { background: #fef2f2; color: #dc2626; }
-        .tx-info { flex: 1; min-width: 0; }
-        .tx-label { font-size: 13.5px; font-weight: 500; color: var(--t1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .tx-date  { font-size: 11.5px; color: var(--t3); margin-top: 2px; }
-        .tx-amount { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; }
-
-        /* ══════════════════════════════════════
-           SEARCH BOX
-        ══════════════════════════════════════ */
-        .search-box {
-            display: flex; gap: 10px;
-            margin-bottom: 20px;
-            align-items: center;
-        }
-        .search-box input {
-            flex: 1;
-            background: var(--card);
-            border: 1.5px solid var(--border2);
-            border-radius: var(--rsm);
-            padding: 10px 14px;
-            color: var(--t1);
-            font-family: 'Sora', sans-serif;
-            font-size: 13.5px;
-        }
-        .search-box input:focus { outline: none; border-color: var(--iris); box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
-
-        /* ══════════════════════════════════════
-           EMPTY STATE
-        ══════════════════════════════════════ */
-        .empty-state { text-align: center; padding: 56px 32px; color: var(--t2); }
-        .empty-icon  { font-size: 44px; margin-bottom: 14px; opacity: .35; color: var(--t3); }
-        .empty-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; color: var(--t1); }
-        .empty-text  { font-size: 13.5px; color: var(--t3); margin-bottom: 22px; }
-
-        /* ══════════════════════════════════════
-           GRIDS
-        ══════════════════════════════════════ */
-        .comptes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-            gap: 18px;
-        }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 22px;
-            align-items: start;
-        }
-
-        /* ══════════════════════════════════════
-           ADMIN HEADER
-        ══════════════════════════════════════ */
-        .admin-header {
-            border-bottom: 2px solid var(--gold-l);
-            padding-bottom: 8px;
-            margin-bottom: 26px;
-        }
-        .admin-header .page-title { color: var(--gold); }
-
-        /* ══════════════════════════════════════
-           SCROLLBAR
-        ══════════════════════════════════════ */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg2); }
-        ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--iris); }
-
-        /* ══════════════════════════════════════
-           RESPONSIVE
-        ══════════════════════════════════════ */
-        @media (max-width: 1024px) { .dashboard-grid { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.mobile-open { transform: translateX(0); }
-            .main-content { margin-left: 0; padding: 20px; }
-            .sidebar-toggle { left: 16px; top: 16px; }
-            .form-row { grid-template-columns: 1fr; }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/irisbank.css') }}">
     {% block stylesheets %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 
-{# ══════════════════ SIDEBAR (uniquement si connecté) ══════════════════ #}
+<button class="theme-toggle" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Changer de thème">
+    <i class="fas fa-moon"></i>
+</button>
+
+{# SIDEBAR NAVIGATION #}
 {% if app.user %}
-
 <div class="sidebar" id="sidebar">
-    {# Logo #}
     <div class="sidebar-logo">
-        <div class="logo-icon"><i class="fas fa-eye"></i></div>
+        <div class="logo-icon">
+            <i class="fas fa-eye"></i>
+        </div>
         <span class="logo-text">IrisBank</span>
     </div>
 
     <nav class="sidebar-nav">
-
-        {# ── CAS 1 : Administrateur → uniquement menu admin ── #}
-        {% if is_granted('ROLE_ADMIN') %}
-
-            <div class="nav-section">
-                <span class="nav-label">Administration</span>
-                <a href="{{ path('admin_dashboard') }}"
-                   class="nav-item admin-nav {% if app.request.attributes.get('_route') == 'admin_dashboard' %}active{% endif %}">
-                    <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
-                </a>
-                <a href="{{ path('admin_clients') }}"
-                   class="nav-item admin-nav {% if 'admin_client' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <i class="fas fa-users"></i><span>Clients</span>
-                </a>
-                <a href="{{ path('admin_comptes') }}"
-                   class="nav-item admin-nav {% if app.request.attributes.get('_route') == 'admin_comptes' or app.request.attributes.get('_route') == 'admin_compte_transactions' %}active{% endif %}">
-                    <i class="fas fa-university"></i><span>Comptes</span>
-                </a>
-            </div>
-
-        {# ── CAS 2 : Client → menu client uniquement ── #}
-        {% else %}
-
-            <div class="nav-section">
-                <span class="nav-label">Mon Espace</span>
-                <a href="{{ path('app_dashboard') }}"
-                   class="nav-item {% if app.request.attributes.get('_route') == 'app_dashboard' %}active{% endif %}">
-                    <i class="fas fa-home"></i><span>Tableau de bord</span>
-                </a>
-                <a href="{{ path('app_comptes_list') }}"
-                   class="nav-item {% if 'app_comptes' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <i class="fas fa-credit-card"></i><span>Mes Comptes</span>
-                </a>
-                <a href="{{ path('app_transactions_history') }}"
-                   class="nav-item {% if app.request.attributes.get('_route') == 'app_transactions_history' %}active{% endif %}">
-                    <i class="fas fa-list-alt"></i><span>Historique</span>
-                </a>
-            </div>
-
-            <div class="nav-section">
-                <span class="nav-label">Opérations</span>
-                <a href="{{ path('app_virement') }}"
-                   class="nav-item {% if app.request.attributes.get('_route') == 'app_virement' %}active{% endif %}">
-                    <i class="fas fa-paper-plane"></i><span>Virement</span>
-                </a>
-            </div>
-
-        {% endif %}
-
-        {# ── Bas de sidebar (commun) ── #}
-        <div class="nav-section nav-bottom">
-            {% if not is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('app_profil') }}"
-               class="nav-item {% if 'app_profil' in app.request.attributes.get('_route') %}active{% endif %}">
-                <i class="fas fa-user-cog"></i><span>Mon Profil</span>
+        <div class="nav-section">
+            <span class="nav-label">Espace Client</span>
+            <a href="{{ path('app_dashboard') }}" class="nav-item {% if app.request.attributes.get('_route') == 'app_dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>Tableau de bord</span>
             </a>
-            {% endif %}
-            <a href="{{ path('app_logout') }}" class="nav-item nav-logout">
-                <i class="fas fa-sign-out-alt"></i><span>Déconnexion</span>
+            <a href="{{ path('app_comptes_list') }}" class="nav-item {% if 'app_comptes' in app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-credit-card"></i>
+                <span>Mes Comptes</span>
+            </a>
+            <a href="{{ path('app_transactions_history') }}" class="nav-item {% if 'app_transactions' in app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Historique</span>
             </a>
         </div>
 
+        <div class="nav-section">
+            <span class="nav-label">Opérations</span>
+            <a href="{{ path('app_virement') }}" class="nav-item">
+                <i class="fas fa-paper-plane"></i>
+                <span>Virement</span>
+            </a>
+        </div>
+
+        {% if is_granted('ROLE_ADMIN') %}
+        <div class="nav-section">
+            <span class="nav-label">Administration</span>
+            <a href="{{ path('admin_dashboard') }}" class="nav-item admin-nav {% if 'admin_dashboard' == app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard Admin</span>
+            </a>
+            <a href="{{ path('admin_clients') }}" class="nav-item admin-nav {% if 'admin_clients' in app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-users"></i>
+                <span>Clients</span>
+            </a>
+            <a href="{{ path('admin_comptes') }}" class="nav-item admin-nav {% if 'admin_comptes' == app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-university"></i>
+                <span>Comptes</span>
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="nav-section nav-bottom">
+            <a href="{{ path('app_profil') }}" class="nav-item {% if 'app_profil' in app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="fas fa-user-cog"></i>
+                <span>Mon Profil</span>
+            </a>
+            <a href="{{ path('app_logout') }}" class="nav-item nav-logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Déconnexion</span>
+            </a>
+        </div>
     </nav>
 
-    {# Infos utilisateur #}
     <div class="sidebar-user">
         <div class="user-avatar">{{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}</div>
         <div class="user-info">
@@ -648,23 +91,24 @@
     </div>
 </div>
 
-<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+<button class="sidebar-toggle" id="sidebarToggle" type="button" onclick="toggleSidebar()" aria-label="Afficher ou masquer la barre latérale">
     <i class="fas fa-bars"></i>
 </button>
 
 <div class="main-content" id="mainContent">
-
 {% else %}
 <div class="auth-wrapper">
 {% endif %}
 
-    {# ══ FLASH MESSAGES ══ #}
+    {# FLASH MESSAGES #}
     {% for type, messages in app.flashes %}
         {% for message in messages %}
         <div class="flash flash-{{ type }}">
             <i class="fas fa-{% if type == 'success' %}check-circle{% elseif type == 'error' %}exclamation-circle{% elseif type == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
             {{ message }}
-            <button class="flash-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            <button class="flash-close" type="button" onclick="this.parentElement.remove()" aria-label="Fermer">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         {% endfor %}
     {% endfor %}
@@ -679,12 +123,48 @@
 
 <script>
 function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('collapsed');
-    document.getElementById('mainContent').classList.toggle('expanded');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+
+    if (sidebar && mainContent) {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('mobile-open');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+    }
 }
-// Auto-hide flash messages après 5s
-document.querySelectorAll('.flash').forEach(f => {
-    setTimeout(() => { f.style.opacity = '0'; setTimeout(() => f.remove(), 300); }, 5000);
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.innerHTML = theme === 'dark'
+            ? '<i class="fas fa-sun"></i>'
+            : '<i class="fas fa-moon"></i>';
+    }
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    applyTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
+
+    document.querySelectorAll('.flash').forEach(flash => {
+        setTimeout(() => {
+            flash.style.opacity = '0';
+            setTimeout(() => flash.remove(), 300);
+        }, 5000);
+    });
 });
 </script>
 {% block javascripts %}{% endblock %}

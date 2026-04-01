@@ -2,10 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\CompteBancaire;
-use App\Entity\Transaction;
 use App\Repository\TransactionRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,23 +14,29 @@ class DashboardController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function home(): Response
     {
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('admin_dashboard');
+        }
+
         return $this->redirectToRoute('app_dashboard');
     }
 
     #[Route('/dashboard', name: 'app_dashboard')]
     public function index(TransactionRepository $transactionRepo): Response
     {
+        if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('admin_dashboard');
+        }
+
         /** @var \App\Entity\User $user */
         $user = $this->getUser();
         $comptes = $user->getComptesBancaires();
 
-        // Calcul du solde total
-        $soldeTotal = 0;
+        $soldeTotal = 0.0;
         foreach ($comptes as $compte) {
             $soldeTotal += $compte->getSoldeFloat();
         }
 
-        // Dernières transactions (5)
         $dernieresTransactions = $transactionRepo->findRecentByUser($user, 5);
 
         return $this->render('dashboard/index.html.twig', [
@@ -41,6 +44,7 @@ class DashboardController extends AbstractController
             'comptes' => $comptes,
             'soldeTotal' => $soldeTotal,
             'dernieresTransactions' => $dernieresTransactions,
+            'todayLabel' => (new \DateTimeImmutable())->format('d/m/Y'),
         ]);
     }
 }

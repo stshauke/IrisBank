@@ -6,7 +6,7 @@
 <div class="auth-box">
     <div class="auth-logo">
         <div class="logo-icon"><i class="fas fa-eye"></i></div>
-        <div class="brand" style="background: linear-gradient(135deg, #f8fafc, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">IrisBank</div>
+        <div class="brand">IrisBank</div>
         <div class="tagline">Votre banque en ligne de confiance</div>
     </div>
 
@@ -17,7 +17,9 @@
     <div class="flash flash-error">
         <i class="fas fa-exclamation-circle"></i>
         {{ error.messageKey|trans(error.messageData, 'security') }}
-        <button class="flash-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+        <button class="flash-close" type="button" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
     {% endif %}
 
@@ -26,30 +28,42 @@
 
         <div class="form-group">
             <label for="email">Adresse email</label>
-            <input type="email" id="email" name="email" value="{{ last_username }}" 
-                   placeholder="votre@email.fr" autocomplete="email" required
-                   style="width:100%; background: #1a2235; border: 1px solid #2d3a4f; border-radius: 10px; padding: 12px 16px; color: #f8fafc; font-family: Sora, sans-serif; font-size: 14px;">
+            <input
+                type="email"
+                id="email"
+                name="email"
+                value="{{ last_username }}"
+                placeholder="votre@email.fr"
+                autocomplete="email"
+                required
+            >
         </div>
 
-        <div class="form-group" style="position: relative;">
+        <div class="form-group password-group">
             <label for="password">Mot de passe</label>
-            <input type="password" id="password" name="password" 
-                   placeholder="••••••••" autocomplete="current-password" required
-                   style="width:100%; background: #1a2235; border: 1px solid #2d3a4f; border-radius: 10px; padding: 12px 48px 12px 16px; color: #f8fafc; font-family: Sora, sans-serif; font-size: 14px;">
-            <button type="button" onclick="togglePassword('password')" 
-                    style="position: absolute; right: 14px; bottom: 12px; background: none; border: none; color: #64748b; cursor: pointer; font-size: 16px;">
-                <i class="fas fa-eye" id="toggleIcon"></i>
-            </button>
+            <div class="password-field">
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                    required
+                >
+                <button type="button" class="password-toggle" onclick="togglePassword('password', 'toggleIcon')">
+                    <i class="fas fa-eye" id="toggleIcon"></i>
+                </button>
+            </div>
         </div>
 
-        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#94a3b8; cursor:pointer; font-weight: 400; text-transform: none; letter-spacing: 0;">
-                <input type="checkbox" name="_remember_me" style="accent-color: #6366f1;">
-                Se souvenir de moi
+        <div class="remember-row">
+            <label class="remember-label">
+                <input type="checkbox" name="_remember_me">
+                <span>Se souvenir de moi</span>
             </label>
         </div>
 
-        <button type="submit" class="btn btn-primary w-full btn-lg" style="justify-content: center;">
+        <button type="submit" class="btn btn-primary w-full btn-lg auth-submit">
             <i class="fas fa-sign-in-alt"></i>
             Se connecter
         </button>
@@ -61,9 +75,14 @@
 </div>
 
 <script>
-function togglePassword(id) {
-    const input = document.getElementById(id);
-    const icon = document.getElementById('toggleIcon');
+function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+
+    if (!input || !icon) {
+        return;
+    }
+
     if (input.type === 'password') {
         input.type = 'text';
         icon.className = 'fas fa-eye-slash';
@@ -72,11 +91,5 @@ function togglePassword(id) {
         icon.className = 'fas fa-eye';
     }
 }
-
-// Focus animation
-document.querySelectorAll('input').forEach(input => {
-    input.addEventListener('focus', () => input.style.borderColor = '#6366f1');
-    input.addEventListener('blur', () => input.style.borderColor = '#2d3a4f');
-});
 </script>
 {% endblock %}

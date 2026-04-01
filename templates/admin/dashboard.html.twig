@@ -3,95 +3,137 @@
 
 {% block body %}
 <div class="admin-header">
-    <div class="page-header" style="margin-bottom: 0;">
+    <div class="page-header admin-page-header">
         <div>
-            <h1 class="page-title">
-                <i class="fas fa-shield-alt" style="font-size: 22px;"></i> Dashboard Administration
+            <h1 class="page-title admin-page-title">
+                <i class="fas fa-shield-alt"></i>
+                Dashboard Administration
             </h1>
-            <p class="page-subtitle">Vue globale du système IrisBank</p>
+            <p class="page-subtitle">{{ todayLabel }} — Vue globale du système IrisBank</p>
         </div>
     </div>
 </div>
 
-{# STATS #}
 <div class="stats-grid">
-    <div class="stat-card" style="--accent-color: #6366f1;">
+    <div class="stat-card" style="--accent-color: var(--iris);">
         <div class="stat-icon"><i class="fas fa-users"></i></div>
         <div class="stat-value">{{ totalClients }}</div>
         <div class="stat-label">Clients enregistrés</div>
     </div>
-    <div class="stat-card" style="--accent-color: #10b981;">
-        <div class="stat-icon" style="background: rgba(16,185,129,0.15); color: #6ee7b7;"><i class="fas fa-university"></i></div>
+
+    <div class="stat-card stat-card-success" style="--accent-color: var(--green);">
+        <div class="stat-icon"><i class="fas fa-university"></i></div>
         <div class="stat-value">{{ totalComptes }}</div>
         <div class="stat-label">Comptes bancaires</div>
     </div>
-    <div class="stat-card" style="--accent-color: #f59e0b;">
-        <div class="stat-icon" style="background: rgba(245,158,11,0.15); color: #fcd34d;"><i class="fas fa-euro-sign"></i></div>
+
+    <div class="stat-card stat-card-warning" style="--accent-color: var(--gold);">
+        <div class="stat-icon"><i class="fas fa-euro-sign"></i></div>
         <div class="stat-value">{{ totalDepots|number_format(0, ',', ' ') }} €</div>
         <div class="stat-label">Total des dépôts</div>
     </div>
+
+    <div class="stat-card stat-card-danger" style="--accent-color: var(--red);">
+        <div class="stat-icon"><i class="fas fa-lock"></i></div>
+        <div class="stat-value">{{ comptesBloques }}</div>
+        <div class="stat-label">Comptes bloqués</div>
+    </div>
 </div>
 
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
-    {# RECENT CLIENTS #}
+<div class="admin-dashboard-grid">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Derniers clients inscrits</h3>
             <a href="{{ path('admin_clients') }}" class="btn btn-outline btn-sm">Tous les clients</a>
         </div>
+
         {% if recentUsers is empty %}
-        <div class="empty-state" style="padding: 32px;"><div class="empty-text" style="margin-bottom: 0;">Aucun client</div></div>
+            <div class="empty-state empty-state-compact">
+                <div class="empty-text empty-text-no-margin">Aucun client</div>
+            </div>
         {% else %}
-        <table style="width: 100%;">
-            <thead>
-                <tr>
-                    <th>Client</th>
-                    <th>Email</th>
-                    <th>Inscrit le</th>
-                    <th>Comptes</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for client in recentUsers %}
-            <tr>
-                <td>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #6366f1, #4338ca); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">
-                            {{ client.prenom|first|upper }}{{ client.nom|first|upper }}
-                        </div>
-                        <span style="font-weight: 600; font-size: 14px;">{{ client.fullName }}</span>
-                    </div>
-                </td>
-                <td style="font-size: 13px; color: #64748b;">{{ client.email }}</td>
-                <td style="font-size: 13px; color: #64748b;">{{ client.createdAt|date('d/m/Y') }}</td>
-                <td>
-                    <span style="background: rgba(99,102,241,0.15); color: #818cf8; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">
-                        {{ client.comptesBancaires|length }}
-                    </span>
-                </td>
-                <td>
-                    <a href="{{ path('admin_client_show', {id: client.id}) }}" class="btn btn-outline btn-sm">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+            <div class="table-container table-plain">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Email</th>
+                            <th>Inscrit le</th>
+                            <th>Comptes</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for client in recentUsers %}
+                        <tr>
+                            <td>
+                                <div class="user-inline">
+                                    <div class="user-inline-avatar">
+                                        {{ client.prenom|first|upper }}{{ client.nom|first|upper }}
+                                    </div>
+                                    <span class="user-inline-name">{{ client.fullName }}</span>
+                                </div>
+                            </td>
+                            <td class="muted-cell">{{ client.email }}</td>
+                            <td class="muted-cell">{{ client.createdAt|date('d/m/Y') }}</td>
+                            <td>
+                                <span class="count-badge">
+                                    {{ client.comptesBancaires|length }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ path('admin_client_show', {id: client.id}) }}" class="btn btn-outline btn-sm">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% endif %}
     </div>
 
-    {# QUICK ACTIONS #}
-    <div class="card">
-        <div class="card-header"><h3 class="card-title">Actions rapides</h3></div>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            <a href="{{ path('admin_clients') }}" class="btn btn-outline" style="justify-content: flex-start;">
-                <i class="fas fa-users" style="color: #6366f1;"></i> Gérer les clients
-            </a>
-            <a href="{{ path('admin_comptes') }}" class="btn btn-outline" style="justify-content: flex-start;">
-                <i class="fas fa-university" style="color: #10b981;"></i> Gérer les comptes
-            </a>
+    <div class="admin-side-stack">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Actions rapides</h3>
+            </div>
+            <div class="quick-links">
+                <a href="{{ path('admin_clients') }}" class="btn btn-outline quick-link">
+                    <i class="fas fa-users quick-link-icon quick-link-icon-iris"></i> Gérer les clients
+                </a>
+                <a href="{{ path('admin_comptes') }}" class="btn btn-outline quick-link">
+                    <i class="fas fa-university quick-link-icon quick-link-icon-green"></i> Gérer les comptes
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Transactions récentes</h3>
+            </div>
+
+            {% if recentTransactions is empty %}
+                <div class="empty-state empty-state-compact">
+                    <div class="empty-text empty-text-no-margin">Aucune transaction récente</div>
+                </div>
+            {% else %}
+                {% for tx in recentTransactions %}
+                    <div class="tx-item">
+                        <div class="tx-icon {{ tx.isCredit ? 'credit' : 'debit' }}">
+                            <i class="fas fa-{% if tx.type == 'depot' %}arrow-down{% elseif tx.type == 'retrait' %}arrow-up{% else %}exchange-alt{% endif %}"></i>
+                        </div>
+                        <div class="tx-info">
+                            <div class="tx-label">{{ tx.libelle ?? tx.typeLabel }}</div>
+                            <div class="tx-date">{{ tx.createdAt|date('d/m/Y à H:i') }}</div>
+                        </div>
+                        <div class="tx-amount {{ tx.isCredit ? 'amount-credit' : 'amount-debit' }}">
+                            {{ tx.montantFloat|number_format(2, ',', ' ') }} €
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </div>

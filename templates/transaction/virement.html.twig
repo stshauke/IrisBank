@@ -2,7 +2,6 @@
 {% block title %}Virement{% endblock %}
 
 {% block body %}
-
 <div class="page-header">
     <div>
         <h1 class="page-title">Effectuer un virement</h1>
@@ -10,99 +9,60 @@
     </div>
 </div>
 
-{# Formulaire pleine largeur #}
-<div class="form-wrapper">
-
-    {# En-tête du formulaire #}
-    <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid var(--border);">
-        <div style="width:50px; height:50px; background:#ede9fe; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--iris); flex-shrink:0;">
-            <i class="fas fa-paper-plane"></i>
-        </div>
-        <div>
-            <div style="font-size:17px; font-weight:700; color:var(--t1);">Virement bancaire</div>
-            <div style="font-size:13px; color:var(--t2);">Sécurisé et instantané — Montant minimum 1 €</div>
-        </div>
-    </div>
-
-    {{ form_start(form) }}
-
-    {# Compte source #}
-    <div class="form-group">
-        <label>Compte source (débiteur)</label>
-        {{ form_widget(form.compteSource, {attr: {class: 'ib-input'}}) }}
-        {{ form_errors(form.compteSource) }}
-    </div>
-
-    <div class="divider"></div>
-
-    {# Bloc destinataire #}
-    <div style="background:#f8fafc; border:1.5px solid var(--border2); border-radius:var(--rsm); padding:20px; margin-bottom:18px;">
-        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--t3); margin-bottom:16px;">
-            <i class="fas fa-arrow-right" style="color:var(--iris);"></i> Destinataire
-        </div>
-
-        {# Option A : un de mes comptes #}
-        <div class="form-group">
-            <label>Vers un de mes comptes</label>
-            {{ form_widget(form.compteDestinataire, {attr: {class: 'ib-input'}}) }}
-            {{ form_errors(form.compteDestinataire) }}
-        </div>
-
-        {# Séparateur OU #}
-        <div style="display:flex; align-items:center; gap:12px; margin:16px 0;">
-            <div style="flex:1; height:1px; background:var(--border2);"></div>
-            <span style="font-size:12px; font-weight:700; color:var(--t3); padding:4px 10px; background:white; border:1px solid var(--border2); border-radius:20px;">OU</span>
-            <div style="flex:1; height:1px; background:var(--border2);"></div>
-        </div>
-
-        {# Option B : IBAN externe #}
-        <div class="form-group" style="margin-bottom:0;">
-            <label>IBAN d'un autre client</label>
-            {{ form_widget(form.ibanDestinataire, {attr: {
-                class: 'ib-input',
-                placeholder: 'FR76-YBNK-XXXX-XXXX-XXXX-XXXX-XXX',
-                style: 'font-family: Space Mono, monospace; letter-spacing: 0.05em;'
-            }}) }}
-            {{ form_errors(form.ibanDestinataire) }}
-            <div style="font-size:11px; color:var(--t3); margin-top:5px;">
-                <i class="fas fa-info-circle"></i> Remplissez ce champ pour un virement vers un autre client
+<div class="form-layout-centered">
+    <div class="form-wrapper">
+        <div class="form-card-header">
+            <div class="form-card-icon form-card-icon-primary">
+                <i class="fas fa-paper-plane"></i>
+            </div>
+            <div>
+                <div class="form-card-title">Virement bancaire</div>
+                <div class="form-card-subtitle">Sécurisé et instantané</div>
             </div>
         </div>
-    </div>
 
-    {# Montant + Libellé côte à côte #}
-    <div class="form-row">
+        {{ form_start(form) }}
+
         <div class="form-group">
-            <label>Montant (€)</label>
-            {{ form_widget(form.montant, {attr: {
-                class: 'ib-input',
-                placeholder: '0,00',
-                style: 'font-family: Space Mono, monospace; font-size: 18px; font-weight: 700; text-align: center;'
-            }}) }}
+            {{ form_label(form.compteSource) }}
+            {{ form_widget(form.compteSource, {attr: {class: 'ib-input'}}) }}
+            {{ form_errors(form.compteSource) }}
+        </div>
+
+        <div class="section-box">
+            <div class="section-box-label">Destinataire</div>
+
+            <div class="form-group">
+                {{ form_label(form.compteDestinataire) }}
+                {{ form_widget(form.compteDestinataire, {attr: {class: 'ib-input'}}) }}
+                {{ form_errors(form.compteDestinataire) }}
+            </div>
+
+            <div class="or-divider">OU</div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+                {{ form_label(form.ibanDestinataire) }}
+                {{ form_widget(form.ibanDestinataire, {attr: {class: 'ib-input', style: 'font-family: Space Mono, monospace;'}}) }}
+                {{ form_errors(form.ibanDestinataire) }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.montant) }}
+            {{ form_widget(form.montant, {attr: {class: 'ib-input', style: 'font-family: Space Mono, monospace; font-size: 20px; font-weight: 700; text-align: center;'}}) }}
             {{ form_errors(form.montant) }}
         </div>
+
         <div class="form-group">
-            <label>Libellé (optionnel)</label>
-            {{ form_widget(form.libelle, {attr: {
-                class: 'ib-input',
-                placeholder: 'Ex : Remboursement, Loyer…'
-            }}) }}
-            {{ form_errors(form.libelle) }}
+            {{ form_label(form.libelle) }}
+            {{ form_widget(form.libelle, {attr: {class: 'ib-input'}}) }}
         </div>
+
+        <button type="submit" class="btn btn-primary w-full btn-lg" style="justify-content: center;">
+            <i class="fas fa-paper-plane"></i> Envoyer le virement
+        </button>
+
+        {{ form_end(form) }}
     </div>
-
-    {# Récapitulatif info #}
-    <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:var(--rsm); padding:13px 16px; margin-bottom:22px; font-size:13px; color:#92400e; display:flex; gap:10px; align-items:flex-start;">
-        <i class="fas fa-shield-alt" style="margin-top:2px; flex-shrink:0;"></i>
-        <span>Le virement est <strong>irréversible</strong> une fois confirmé. Vérifiez bien le compte destinataire et le montant avant de valider.</span>
-    </div>
-
-    {# Bouton pleine largeur #}
-    <button type="submit" class="btn btn-primary w-full btn-lg">
-        <i class="fas fa-paper-plane"></i> Envoyer le virement
-    </button>
-
-    {{ form_end(form) }}
 </div>
-
 {% endblock %}

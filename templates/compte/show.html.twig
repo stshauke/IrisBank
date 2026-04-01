@@ -2,21 +2,17 @@
 {% block title %}{{ compte.typeLabel }}{% endblock %}
 
 {% block body %}
-
-{# ── En-tête ── #}
 <div class="page-header">
     <div>
-        <a href="{{ path('app_comptes_list') }}"
-           style="color:var(--t2); text-decoration:none; font-size:14px; display:inline-flex; align-items:center; gap:6px;">
+        <a href="{{ path('app_comptes_list') }}" class="back-link">
             <i class="fas fa-arrow-left"></i> Mes comptes
         </a>
-        <h1 class="page-title" style="margin-top:8px;">{{ compte.typeLabel }}</h1>
+        <h1 class="page-title" style="margin-top: 8px;">{{ compte.typeLabel }}</h1>
         <p class="page-subtitle">{{ compte.iban }}</p>
     </div>
-
     {% if compte.isActif %}
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <a href="{{ path('app_depot',   {id: compte.id}) }}" class="btn btn-success">
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="{{ path('app_depot', {id: compte.id}) }}" class="btn btn-success">
             <i class="fas fa-arrow-down"></i> Dépôt
         </a>
         <a href="{{ path('app_retrait', {id: compte.id}) }}" class="btn btn-warning">
@@ -29,13 +25,9 @@
     {% endif %}
 </div>
 
-<div style="display:grid; grid-template-columns:1fr 2fr; gap:24px; align-items:start;">
-
-    {# ══ COLONNE GAUCHE : infos du compte ══ #}
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; align-items: start;">
     <div>
-
-        {# Carte visuelle #}
-        <div class="compte-card {{ compte.type }}" style="margin-bottom:18px;">
+        <div class="compte-card {{ compte.type }}" style="margin-bottom: 20px;">
             <div class="badge">
                 <i class="fas fa-{% if compte.type == 'courant' %}credit-card{% elseif compte.type == 'livret_a' %}piggy-bank{% else %}home{% endif %}"></i>
                 {{ compte.typeLabel }}
@@ -44,88 +36,63 @@
             <div class="compte-iban">{{ compte.iban }}</div>
         </div>
 
-        {# Informations #}
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Informations</h3>
             </div>
-
-            <table style="width:100%;">
-                <tr style="border-bottom:1px solid var(--border);">
-                    <td style="padding:10px 0; font-size:13px; color:var(--t2);">Statut</td>
-                    <td style="padding:10px 0; text-align:right;">
+            <table class="info-table">
+                <tr>
+                    <td class="info-label">Statut</td>
+                    <td class="info-value">
                         <span class="status-badge {{ compte.isActif ? 'status-actif' : 'status-bloque' }}">
                             <i class="fas fa-{{ compte.isActif ? 'check-circle' : 'lock' }}"></i>
                             {{ compte.isActif ? 'Actif' : 'Bloqué' }}
                         </span>
                     </td>
                 </tr>
-                <tr style="border-bottom:1px solid var(--border);">
-                    <td style="padding:10px 0; font-size:13px; color:var(--t2);">Type</td>
-                    <td style="padding:10px 0; text-align:right; font-size:14px; font-weight:600; color:var(--t1);">
-                        {{ compte.typeLabel }}
-                    </td>
+                <tr>
+                    <td class="info-label">Type</td>
+                    <td class="info-value">{{ compte.typeLabel }}</td>
                 </tr>
-                <tr style="border-bottom:1px solid var(--border);">
-                    <td style="padding:10px 0; font-size:13px; color:var(--t2);">Solde</td>
-                    <td style="padding:10px 0; text-align:right; font-family:'Space Mono',monospace;
-                               font-size:14px; font-weight:700;
-                               color:{{ compte.soldeFloat > 0 ? '#059669' : (compte.soldeFloat < 0 ? '#dc2626' : 'var(--t2)') }};">
-                        {{ compte.soldeFloat|number_format(2, ',', ' ') }} €
+                <tr>
+                    <td class="info-label">Solde</td>
+                    <td class="info-value" style="font-family: 'Space Mono', monospace;">
+                        <span class="{{ compte.soldeFloat >= 0 ? 'amount-positive' : 'amount-negative' }}">
+                            {{ compte.soldeFloat|number_format(2, ',', ' ') }} €
+                        </span>
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding:10px 0; font-size:13px; color:var(--t2);">Ouvert le</td>
-                    <td style="padding:10px 0; text-align:right; font-size:13px; color:var(--t1);">
-                        {{ compte.createdAt|date('d/m/Y') }}
-                    </td>
+                    <td class="info-label">Ouvert le</td>
+                    <td class="info-value">{{ compte.createdAt|date('d/m/Y') }}</td>
                 </tr>
             </table>
 
+            {% if compte.soldeFloat == 0 and compte.isActif %}
             <div class="divider"></div>
-
-            {#
-              ══════════════════════════════════════════
-              ZONE SUPPRESSION — RÉSERVÉE À L'ADMIN
-              Le client voit uniquement un message info.
-              ══════════════════════════════════════════
-            #}
-            <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:var(--rsm);
-                        padding:14px 16px; display:flex; gap:10px; align-items:flex-start;">
-                <i class="fas fa-info-circle" style="color:#3b82f6; margin-top:2px; flex-shrink:0;"></i>
-                <div>
-                    <div style="font-size:13px; font-weight:700; color:#1e40af; margin-bottom:3px;">
-                        Fermeture de compte
-                    </div>
-                    <div style="font-size:12px; color:#1d4ed8; line-height:1.5;">
-                        La suppression d'un compte est effectuée uniquement par un
-                        <strong>administrateur</strong>. Contactez votre conseiller si vous
-                        souhaitez fermer ce compte.
-                    </div>
-                </div>
-            </div>
-
+            <form method="post" action="{{ path('app_comptes_delete', {id: compte.id}) }}"
+                  onsubmit="return confirm('⚠️ Êtes-vous sûr de vouloir supprimer ce compte ? Cette action est irréversible.')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete_compte_' ~ compte.id) }}">
+                <button type="submit" class="btn btn-danger w-full" style="justify-content: center;">
+                    <i class="fas fa-trash"></i> Supprimer le compte
+                </button>
+            </form>
+            <p style="font-size: 11px; color: var(--text-3); margin-top: 8px; text-align: center;">Possible uniquement si solde = 0€</p>
+            {% endif %}
         </div>
     </div>
 
-    {# ══ COLONNE DROITE : historique des transactions ══ #}
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Historique des transactions</h3>
-            <span style="font-size:13px; color:var(--t2);">
-                {{ transactions|length }} opération{{ transactions|length > 1 ? 's' : '' }}
-            </span>
+            <span style="font-size: 13px; color: var(--text-3);">{{ transactions|length }} opération{{ transactions|length > 1 ? 's' : '' }}</span>
         </div>
 
         {% if transactions is empty %}
-        <div class="empty-state" style="padding:40px 24px;">
-            <div class="empty-icon"><i class="fas fa-history"></i></div>
-            <div class="empty-title">Aucune transaction</div>
-            <div class="empty-text" style="margin-bottom:0;">
-                Les opérations sur ce compte apparaîtront ici.
-            </div>
+        <div class="empty-state" style="padding: 32px;">
+            <div class="empty-icon" style="font-size: 36px;"><i class="fas fa-history"></i></div>
+            <div class="empty-text" style="margin-bottom: 0;">Aucune transaction sur ce compte</div>
         </div>
-
         {% else %}
         {% for tx in transactions %}
         <div class="tx-item">
@@ -137,21 +104,19 @@
                 <div class="tx-date">
                     {{ tx.typeLabel }}
                     {% if tx.compteSource and tx.compteSource.id != compte.id %}
-                        · De {{ tx.compteSource.iban }}
+                     · De {{ tx.compteSource.iban }}
                     {% elseif tx.compteDestinataire and tx.compteDestinataire.id != compte.id %}
-                        · Vers {{ tx.compteDestinataire.iban }}
+                     · Vers {{ tx.compteDestinataire.iban }}
                     {% endif %}
                     · {{ tx.createdAt|date('d/m/Y à H:i') }}
                 </div>
             </div>
             <div class="tx-amount {{ tx.isCredit ? 'amount-credit' : 'amount-debit' }}">
-                {{ tx.isCredit ? '+' : '−' }}{{ tx.montantFloat|number_format(2, ',', ' ') }} €
+                {{ tx.isCredit ? '+' : '-' }}{{ tx.montantFloat|number_format(2, ',', ' ') }} €
             </div>
         </div>
         {% endfor %}
         {% endif %}
-
     </div>
 </div>
-
 {% endblock %}

@@ -5,7 +5,7 @@
 <div class="admin-header">
     <div class="page-header" style="margin-bottom: 0;">
         <div>
-            <a href="{{ path('admin_client_show', {id: client.id}) }}" style="color: #94a3b8; text-decoration: none; font-size: 14px;">
+            <a href="{{ path('admin_client_show', {id: client.id}) }}" class="back-link">
                 <i class="fas fa-arrow-left"></i> Retour
             </a>
             <h1 class="page-title" style="margin-top: 8px;">Modifier {{ client.fullName }}</h1>
@@ -13,57 +13,54 @@
     </div>
 </div>
 
-<div class="form-wrapper" style="max-width: 640px;">
-    {{ form_start(form) }}
+<div class="form-layout-centered">
+    <div class="form-wrapper">
+        {{ form_start(form) }}
 
-    <div class="form-row">
-        <div class="form-group">
-            {{ form_label(form.nom) }}
-            {{ form_widget(form.nom, {attr: {class: 'ib-input'}}) }}
-            {{ form_errors(form.nom) }}
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.nom) }}
+                {{ form_widget(form.nom, {attr: {class: 'ib-input'}}) }}
+                {{ form_errors(form.nom) }}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.prenom) }}
+                {{ form_widget(form.prenom, {attr: {class: 'ib-input'}}) }}
+                {{ form_errors(form.prenom) }}
+            </div>
         </div>
+
         <div class="form-group">
-            {{ form_label(form.prenom) }}
-            {{ form_widget(form.prenom, {attr: {class: 'ib-input'}}) }}
-            {{ form_errors(form.prenom) }}
+            {{ form_label(form.email) }}
+            {{ form_widget(form.email, {attr: {class: 'ib-input'}}) }}
+            {{ form_errors(form.email) }}
         </div>
-    </div>
 
-    <div class="form-group">
-        {{ form_label(form.email) }}
-        {{ form_widget(form.email, {attr: {class: 'ib-input'}}) }}
-        {{ form_errors(form.email) }}
-    </div>
+        <div class="form-row">
+            <div class="form-group">
+                {{ form_label(form.telephone) }}
+                {{ form_widget(form.telephone, {attr: {class: 'ib-input'}}) }}
+                {{ form_errors(form.telephone) }}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.dateNaissance) }}
+                {{ form_widget(form.dateNaissance, {attr: {class: 'ib-input'}}) }}
+            </div>
+        </div>
 
-    <div class="form-row">
         <div class="form-group">
-            {{ form_label(form.telephone) }}
-            {{ form_widget(form.telephone, {attr: {class: 'ib-input'}}) }}
-            {{ form_errors(form.telephone) }}
+            {{ form_label(form.adresse) }}
+            {{ form_widget(form.adresse, {attr: {class: 'ib-input'}}) }}
         </div>
-        <div class="form-group">
-            {{ form_label(form.dateNaissance) }}
-            {{ form_widget(form.dateNaissance, {attr: {class: 'ib-input'}}) }}
+
+        <div style="display: flex; gap: 12px;">
+            <button type="submit" class="btn btn-warning btn-lg" style="justify-content: center; flex: 1;">
+                <i class="fas fa-save"></i> Enregistrer
+            </button>
+            <a href="{{ path('admin_client_show', {id: client.id}) }}" class="btn btn-outline btn-lg">Annuler</a>
         </div>
-    </div>
 
-    <div class="form-group">
-        {{ form_label(form.adresse) }}
-        {{ form_widget(form.adresse, {attr: {class: 'ib-input'}}) }}
+        {{ form_end(form) }}
     </div>
-
-    <div style="display: flex; gap: 12px;">
-        <button type="submit" class="btn btn-warning btn-lg" style="justify-content: center; flex: 1;">
-            <i class="fas fa-save"></i> Enregistrer
-        </button>
-        <a href="{{ path('admin_client_show', {id: client.id}) }}" class="btn btn-outline btn-lg">Annuler</a>
-    </div>
-
-    {{ form_end(form) }}
 </div>
-
-<style>
-.ib-input { width: 100%; background: #1a2235; border: 1px solid #2d3a4f; border-radius: 10px; padding: 12px 16px; color: #f8fafc; font-family: 'Sora', sans-serif; font-size: 14px; transition: all 0.25s ease; }
-.ib-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
-</style>
 {% endblock %}
