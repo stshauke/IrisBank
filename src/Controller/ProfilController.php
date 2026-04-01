@@ -46,11 +46,12 @@ class ProfilController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            if (!$passwordHasher->isPasswordValid($user, $data['currentPassword'])) {
+            $currentPassword = $form->get('currentPassword')->getData();
+            $newPassword = $form->get('newPassword')->getData();
+            if (!$passwordHasher->isPasswordValid($user, $currentPassword)) {
                 $this->addFlash('error', 'Mot de passe actuel incorrect.');
             } else {
-                $user->setPassword($passwordHasher->hashPassword($user, $data['newPassword']));
+                $user->setPassword($passwordHasher->hashPassword($user, $newPassword));
                 $em->flush();
                 $this->addFlash('success', '🔐 Mot de passe modifié avec succès !');
                 return $this->redirectToRoute('app_profil');

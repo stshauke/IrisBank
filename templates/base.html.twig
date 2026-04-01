@@ -101,17 +101,21 @@
 {% endif %}
 
     {# FLASH MESSAGES #}
-    {% for type, messages in app.flashes %}
-        {% for message in messages %}
-        <div class="flash flash-{{ type }}">
-            <i class="fas fa-{% if type == 'success' %}check-circle{% elseif type == 'error' %}exclamation-circle{% elseif type == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
-            {{ message }}
-            <button class="flash-close" type="button" onclick="this.parentElement.remove()" aria-label="Fermer">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
+    {% if app.flashes|length > 0 %}
+    <div class="flash-container">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+            <div class="flash flash-{{ type }}">
+                <i class="fas fa-{% if type == 'success' %}check-circle{% elseif type == 'error' %}exclamation-circle{% elseif type == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                {{ message }}
+                <button class="flash-close" type="button" onclick="this.parentElement.remove()" aria-label="Fermer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
+    </div>
+    {% endif %}
 
     {% block body %}{% endblock %}
 
