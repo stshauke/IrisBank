@@ -1,11 +1,15 @@
 <?php
-
+// ============================================================
+// src/Controller/CompteController.php
+//
+// ⚠️  UN CLIENT NE PEUT PAS SUPPRIMER SES COMPTES.
+//     La suppression est réservée à l'administrateur.
+// ============================================================
 namespace App\Controller;
 
 use App\Entity\CompteBancaire;
 use App\Form\CompteType;
 use App\Service\BanqueService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,15 +20,20 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/comptes')]
 class CompteController extends AbstractController
 {
+    // ──────────────────────────────────────────
+    //  LISTE DES COMPTES
+    // ──────────────────────────────────────────
     #[Route('/', name: 'app_comptes_list')]
     public function list(): Response
     {
-        $user = $this->getUser();
         return $this->render('compte/list.html.twig', [
-            'comptes' => $user->getComptesBancaires(),
+            'comptes' => $this->getUser()->getComptesBancaires(),
         ]);
     }
 
+    // ──────────────────────────────────────────
+    //  CRÉER UN NOUVEAU COMPTE
+    // ──────────────────────────────────────────
     #[Route('/nouveau', name: 'app_comptes_new')]
     public function new(Request $request, BanqueService $banqueService): Response
     {
@@ -32,7 +41,7 @@ class CompteController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $type = $form->get('type')->getData();
+            $type   = $form->get('type')->getData();
             $compte = $banqueService->creerCompte($this->getUser(), $type);
             $this->addFlash('success', '✅ Compte ' . $compte->getTypeLabel() . ' créé avec succès !');
             return $this->redirectToRoute('app_comptes_show', ['id' => $compte->getId()]);
@@ -41,40 +50,34 @@ class CompteController extends AbstractController
         return $this->render('compte/new.html.twig', ['form' => $form]);
     }
 
+    // ──────────────────────────────────────────
+    //  DÉTAIL D'UN COMPTE
+    // ──────────────────────────────────────────
     #[Route('/{id}', name: 'app_comptes_show')]
     public function show(CompteBancaire $compte): Response
     {
         $this->checkOwnership($compte);
+
         return $this->render('compte/show.html.twig', [
-            'compte' => $compte,
+            'compte'       => $compte,
             'transactions' => $compte->getAllTransactions(),
         ]);
     }
 
-    #[Route('/{id}/supprimer', name: 'app_comptes_delete', methods: ['POST'])]
-    public function delete(CompteBancaire $compte, BanqueService $banqueService, Request $request): Response
-    {
-        $this->checkOwnership($compte);
+    // ──────────────────────────────────────────
+    //  ❌ SUPPRESSION RETIRÉE CÔTÉ CLIENT
+    //  La suppression d'un compte est uniquement
+    //  possible par un administrateur depuis
+    //  /admin/clients/{id}
+    // ──────────────────────────────────────────
 
-        if (!$this->isCsrfTokenValid('delete_compte_' . $compte->getId(), $request->request->get('_token'))) {
-            $this->addFlash('error', 'Token CSRF invalide.');
-            return $this->redirectToRoute('app_comptes_list');
-        }
-
-        try {
-            $banqueService->supprimerCompte($compte);
-            $this->addFlash('success', '🗑️ Compte supprimé avec succès.');
-        } catch (\Exception $e) {
-            $this->addFlash('error', $e->getMessage());
-        }
-
-        return $this->redirectToRoute('app_comptes_list');
-    }
-
+    // ──────────────────────────────────────────
+    //  MÉTHODE PRIVÉE : vérifier le propriétaire
+    // ──────────────────────────────────────────
     private function checkOwnership(CompteBancaire $compte): void
     {
         if ($compte->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Accès refusé à ce compte.');
+            throw $this->createAccessDeniedException('Vous n\'avez pas accès à ce compte.');
         }
     }
 }

@@ -2,64 +2,163 @@
 {% block title %}Client — {{ client.fullName }}{% endblock %}
 
 {% block body %}
+
+{# ── En-tête ── #}
 <div class="admin-header">
-    <div class="page-header" style="margin-bottom: 0;">
+    <div class="page-header" style="margin-bottom:0;">
         <div>
-            <a href="{{ path('admin_clients') }}" style="color: #94a3b8; text-decoration: none; font-size: 14px;">
+            <a href="{{ path('admin_clients') }}"
+               style="color:var(--t2); text-decoration:none; font-size:14px; display:inline-flex; align-items:center; gap:6px;">
                 <i class="fas fa-arrow-left"></i> Clients
             </a>
-            <h1 class="page-title" style="margin-top: 8px;">{{ client.fullName }}</h1>
+            <h1 class="page-title" style="margin-top:8px;">{{ client.fullName }}</h1>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
             <a href="{{ path('admin_client_edit', {id: client.id}) }}" class="btn btn-warning">
                 <i class="fas fa-edit"></i> Modifier
             </a>
-            <form method="post" action="{{ path('admin_client_delete', {id: client.id}) }}" 
-                  onsubmit="return confirm('Supprimer définitivement ce client ?')">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ client.id) }}">
-                <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Supprimer</button>
-            </form>
+
+            {#
+              Bouton SUPPRIMER LE CLIENT :
+              - Désactivé si au moins un compte a un solde > 0
+              - Actif uniquement si tous les comptes sont à 0 €
+            #}
+            {% set soldeNonNul = false %}
+            {% for compte in client.comptesBancaires %}
+                {% if compte.soldeFloat > 0 %}
+                    {% set soldeNonNul = true %}
+                {% endif %}
+            {% endfor %}
+
+            {% if soldeNonNul %}
+                {# Bouton désactivé + tooltip d'explication #}
+                <button type="button" disabled title="Impossible : un ou plusieurs comptes ont un solde > 0 €"
+                        style="display:inline-flex; align-items:center; gap:8px; padding:9px 18px;
+                               border-radius:var(--rsm); font-family:'Sora',sans-serif; font-size:13.5px;
+                               font-weight:600; background:#f1f5f9; border:1.5px dashed #cbd5e1;
+                               color:#94a3b8; cursor:not-allowed;">
+                    <i class="fas fa-ban"></i> Supprimer client
+                </button>
+            {% else %}
+                <form method="post" action="{{ path('admin_client_delete', {id: client.id}) }}"
+                      onsubmit="return confirm('⚠️ Supprimer définitivement le client {{ client.fullName|e('js') }} et tous ses comptes ?\nCette action est irréversible.')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ client.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Supprimer client
+                    </button>
+                </form>
+            {% endif %}
         </div>
     </div>
 </div>
 
-<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; align-items: start;">
+{# Avertissement si des comptes ont un solde non nul #}
+{% if soldeNonNul %}
+<div style="background:#fef2f2; border:1px solid #fecaca; border-radius:var(--rsm);
+            padding:14px 18px; margin-bottom:22px; display:flex; gap:12px; align-items:flex-start;">
+    <i class="fas fa-exclamation-triangle" style="color:#dc2626; margin-top:2px; flex-shrink:0; font-size:16px;"></i>
+    <div>
+        <div style="font-size:13.5px; font-weight:700; color:#991b1b; margin-bottom:4px;">
+            Suppression du client impossible
+        </div>
+        <div style="font-size:13px; color:#b91c1c; line-height:1.5;">
+            Ce client possède des comptes avec un solde supérieur à 0 €.
+            Vous devez d'abord ramener <strong>tous les comptes à 0 €</strong>
+            (en supprimant chaque compte individuellement) avant de pouvoir supprimer ce client.
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div style="display:grid; grid-template-columns:1fr 2fr; gap:24px; align-items:start;">
+
+    {# ══ COLONNE GAUCHE : infos client ══ #}
     <div class="card">
-        <div style="text-align: center; padding: 16px 0 24px;">
-            <div style="width: 72px; height: 72px; background: linear-gradient(135deg, #6366f1, #4338ca); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; margin: 0 auto 16px;">
+        <div style="text-align:center; padding:16px 0 22px;">
+            <div style="width:68px; height:68px; background:linear-gradient(135deg,#6366f1,#4338ca);
+                        border-radius:18px; display:flex; align-items:center; justify-content:center;
+                        font-size:22px; font-weight:800; color:white; margin:0 auto 14px;">
                 {{ client.prenom|first|upper }}{{ client.nom|first|upper }}
             </div>
-            <div style="font-size: 18px; font-weight: 700;">{{ client.fullName }}</div>
+            <div style="font-size:17px; font-weight:700; color:var(--t1);">{{ client.fullName }}</div>
+            <div style="font-size:12px; color:var(--t3); margin-top:4px;">
+                Client depuis {{ client.createdAt|date('d/m/Y') }}
+            </div>
         </div>
-        <table style="width: 100%;">
-            <tr style="border-bottom: 1px solid #1e293b;"><td style="padding: 10px 0; font-size: 12px; color: #64748b; text-transform: uppercase;">Email</td><td style="padding: 10px 0; font-size: 13px; text-align: right;">{{ client.email }}</td></tr>
-            <tr style="border-bottom: 1px solid #1e293b;"><td style="padding: 10px 0; font-size: 12px; color: #64748b; text-transform: uppercase;">Téléphone</td><td style="padding: 10px 0; font-size: 13px; text-align: right;">{{ client.telephone ?? '—' }}</td></tr>
-            <tr style="border-bottom: 1px solid #1e293b;"><td style="padding: 10px 0; font-size: 12px; color: #64748b; text-transform: uppercase;">Adresse</td><td style="padding: 10px 0; font-size: 13px; text-align: right;">{{ client.adresse ?? '—' }}</td></tr>
-            <tr style="border-bottom: 1px solid #1e293b;"><td style="padding: 10px 0; font-size: 12px; color: #64748b; text-transform: uppercase;">Naissance</td><td style="padding: 10px 0; font-size: 13px; text-align: right;">{{ client.dateNaissance ? client.dateNaissance|date('d/m/Y') : '—' }}</td></tr>
-            <tr><td style="padding: 10px 0; font-size: 12px; color: #64748b; text-transform: uppercase;">Inscrit le</td><td style="padding: 10px 0; font-size: 13px; text-align: right;">{{ client.createdAt|date('d/m/Y') }}</td></tr>
+
+        <table style="width:100%;">
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:9px 0; font-size:11px; color:var(--t3); text-transform:uppercase; font-weight:700;">Email</td>
+                <td style="padding:9px 0; font-size:13px; text-align:right; color:var(--t1);">{{ client.email }}</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:9px 0; font-size:11px; color:var(--t3); text-transform:uppercase; font-weight:700;">Téléphone</td>
+                <td style="padding:9px 0; font-size:13px; text-align:right; color:var(--t1);">{{ client.telephone ?? '—' }}</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:9px 0; font-size:11px; color:var(--t3); text-transform:uppercase; font-weight:700;">Adresse</td>
+                <td style="padding:9px 0; font-size:13px; text-align:right; color:var(--t1);">{{ client.adresse ?? '—' }}</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:9px 0; font-size:11px; color:var(--t3); text-transform:uppercase; font-weight:700;">Naissance</td>
+                <td style="padding:9px 0; font-size:13px; text-align:right; color:var(--t1);">
+                    {{ client.dateNaissance ? client.dateNaissance|date('d/m/Y') : '—' }}
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:9px 0; font-size:11px; color:var(--t3); text-transform:uppercase; font-weight:700;">Comptes</td>
+                <td style="padding:9px 0; text-align:right;">
+                    <span style="background:#ede9fe; color:#4f46e5; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700;">
+                        {{ client.comptesBancaires|length }}
+                    </span>
+                </td>
+            </tr>
         </table>
     </div>
 
+    {# ══ COLONNE DROITE : comptes bancaires ══ #}
     <div>
-        <div class="card-header" style="margin-bottom: 16px;">
-            <h3 class="card-title">Comptes bancaires ({{ client.comptesBancaires|length }})</h3>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <h3 style="font-size:15px; font-weight:700; color:var(--t1);">
+                Comptes bancaires ({{ client.comptesBancaires|length }})
+            </h3>
         </div>
+
         {% if client.comptesBancaires is empty %}
-        <div class="empty-state" style="background: #111827; border: 1px solid #1e293b; border-radius: 16px; padding: 32px;">
-            <div class="empty-text" style="margin-bottom: 0;">Aucun compte</div>
+        <div class="empty-state" style="background:white; border:1px solid var(--border); border-radius:var(--r); padding:32px;">
+            <div class="empty-icon"><i class="fas fa-university"></i></div>
+            <div class="empty-text" style="margin-bottom:0;">Ce client n'a aucun compte bancaire.</div>
         </div>
+
         {% else %}
         <div class="comptes-grid">
         {% for compte in client.comptesBancaires %}
-        <div class="compte-card {{ compte.type }}" style="position: relative;">
-            <span class="status-badge {{ compte.isActif ? 'status-actif' : 'status-bloque' }}" style="position: absolute; top: 16px; right: 16px;">
-                <i class="fas fa-{{ compte.isActif ? 'check' : 'lock' }}"></i>
+        <div class="compte-card {{ compte.type }}" style="position:relative;">
+
+            {# Badge statut en haut à droite #}
+            <span class="status-badge {{ compte.isActif ? 'status-actif' : 'status-bloque' }}"
+                  style="position:absolute; top:14px; right:14px;">
+                <i class="fas fa-{{ compte.isActif ? 'check-circle' : 'lock' }}"></i>
                 {{ compte.isActif ? 'Actif' : 'Bloqué' }}
             </span>
-            <div class="badge"><i class="fas fa-credit-card"></i> {{ compte.typeLabel }}</div>
+
+            {# Type de compte #}
+            <div class="badge">
+                <i class="fas fa-{% if compte.type == 'courant' %}credit-card{% elseif compte.type == 'livret_a' %}piggy-bank{% else %}home{% endif %}"></i>
+                {{ compte.typeLabel }}
+            </div>
+
+            {# Solde #}
             <div class="compte-solde">{{ compte.soldeFloat|number_format(2, ',', ' ') }} €</div>
             <div class="compte-iban">{{ compte.iban }}</div>
-            <div class="compte-actions">
+            <div style="font-size:11px; color:rgba(255,255,255,.5); margin-top:6px;">
+                Ouvert le {{ compte.createdAt|date('d/m/Y') }}
+            </div>
+
+            {# ── Actions sur le compte ── #}
+            <div class="compte-actions" style="margin-top:16px; flex-wrap:wrap;">
+
+                {# Bloquer / Débloquer #}
                 <form method="post" action="{{ path('admin_compte_toggle', {id: compte.id}) }}">
                     <input type="hidden" name="_token" value="{{ csrf_token('toggle_compte_' ~ compte.id) }}">
                     <button type="submit" class="btn btn-sm {{ compte.isActif ? 'btn-danger' : 'btn-success' }}">
@@ -67,14 +166,56 @@
                         {{ compte.isActif ? 'Bloquer' : 'Débloquer' }}
                     </button>
                 </form>
-                <a href="{{ path('admin_compte_transactions', {id: compte.id}) }}" class="btn btn-outline btn-sm">
+
+                {# Voir les transactions #}
+                <a href="{{ path('admin_compte_transactions', {id: compte.id}) }}" class="btn btn-outline btn-sm"
+                   style="background:rgba(255,255,255,.15); color:white; border-color:rgba(255,255,255,.3);">
                     <i class="fas fa-history"></i> Transactions
                 </a>
+
+                {#
+                  Supprimer le compte :
+                  - Solde = 0 €  → bouton rouge actif
+                  - Solde > 0 €  → bouton grisé + message
+                #}
+                {% set solde = compte.soldeFloat %}
+                {% if solde == 0 %}
+                    <form method="post" action="{{ path('admin_compte_delete', {id: compte.id}) }}"
+                          onsubmit="return confirm('Supprimer définitivement le compte {{ compte.typeLabel|e('js') }} ?\nSolde : 0 €. Cette action est irréversible.')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('admin_delete_compte_' ~ compte.id) }}">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </form>
+                {% else %}
+                    <button type="button" disabled
+                            title="Solde non nul ({{ solde|number_format(2, ',', ' ') }} €) — impossible de supprimer"
+                            style="display:inline-flex; align-items:center; gap:6px; padding:5px 12px;
+                                   border-radius:var(--rsm); font-size:12px; font-weight:600;
+                                   background:rgba(0,0,0,.2); border:1px dashed rgba(255,255,255,.25);
+                                   color:rgba(255,255,255,.4); cursor:not-allowed;">
+                        <i class="fas fa-ban"></i> Suppression impossible
+                    </button>
+                {% endif %}
+
+            </div>{# fin compte-actions #}
+
+            {# Message d'info si solde > 0 #}
+            {% if solde > 0 %}
+            <div style="margin-top:10px; background:rgba(220,38,38,.2); border:1px solid rgba(220,38,38,.3);
+                        border-radius:8px; padding:8px 10px; font-size:11px; color:rgba(255,200,200,.9);
+                        display:flex; gap:8px; align-items:flex-start;">
+                <i class="fas fa-exclamation-triangle" style="flex-shrink:0; margin-top:1px;"></i>
+                <span>Solde de <strong>{{ solde|number_format(2, ',', ' ') }} €</strong> — ramenez-le à 0 € pour pouvoir supprimer ce compte.</span>
             </div>
+            {% endif %}
+
         </div>
         {% endfor %}
         </div>
         {% endif %}
+
     </div>
 </div>
+
 {% endblock %}

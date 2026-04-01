@@ -2,25 +2,100 @@
 {% block title %}Admin — Clients{% endblock %}
 
 {% block body %}
+
 <div class="admin-header">
-    <div class="page-header" style="margin-bottom: 0;">
+    <div class="page-header" style="margin-bottom:0;">
         <div>
             <h1 class="page-title"><i class="fas fa-users"></i> Gestion des Clients</h1>
-            <p class="page-subtitle">{{ clients|length }} client{{ clients|length > 1 ? 's' : '' }}</p>
+            <p class="page-subtitle" style="color:var(--t2);">{{ clients|length }} client{{ clients|length > 1 ? 's' : '' }} trouvé{{ clients|length > 1 ? 's' : '' }}</p>
         </div>
     </div>
 </div>
 
-<form method="get" action="{{ path('admin_clients') }}" class="search-box">
-    <input type="text" name="search" value="{{ search }}" placeholder="🔍 Rechercher par nom, email...">
-    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Chercher</button>
-    {% if search %}<a href="{{ path('admin_clients') }}" class="btn btn-outline"><i class="fas fa-times"></i></a>{% endif %}
+{# ── Barre de recherche avec 3 critères ── #}
+<form method="get" action="{{ path('admin_clients') }}">
+    <div style="background:white; border:1px solid var(--border); border-radius:var(--r); padding:20px; margin-bottom:22px; box-shadow:var(--shadow);">
+        <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--t3); margin-bottom:14px;">
+            <i class="fas fa-search" style="color:var(--iris);"></i> Rechercher un client
+        </div>
+
+        <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:14px;">
+
+            {# Recherche nom / prénom / email #}
+            <div>
+                <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--t2); margin-bottom:6px;">
+                    Nom, prénom ou email
+                </label>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="Ex : Dupont, Jean, jean@..."
+                    class="ib-input"
+                    style="background:#f8fafc; border:1.5px solid var(--border2); border-radius:var(--rsm); padding:10px 13px; width:100%; font-family:Sora,sans-serif; font-size:13px; color:var(--t1);"
+                >
+            </div>
+
+            {# Recherche par numéro de compte (IBAN) #}
+            <div>
+                <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--t2); margin-bottom:6px;">
+                    Numéro de compte (IBAN)
+                </label>
+                <input
+                    type="text"
+                    name="iban"
+                    value="{{ iban ?? '' }}"
+                    placeholder="Ex : FR76-YBNK-..."
+                    style="width:100%; background:#f8fafc; border:1.5px solid var(--border2); border-radius:var(--rsm); padding:10px 13px; font-family:'Space Mono',monospace; font-size:12px; color:var(--t1); transition:all .2s;"
+                    onfocus="this.style.borderColor='#6366f1'"
+                    onblur="this.style.borderColor='#cbd5e1'"
+                >
+            </div>
+
+            {# Nombre de comptes #}
+            <div>
+                <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--t2); margin-bottom:6px;">
+                    Nombre de comptes
+                </label>
+                <select
+                    name="nb_comptes"
+                    style="width:100%; background:#f8fafc; border:1.5px solid var(--border2); border-radius:var(--rsm); padding:10px 13px; font-family:Sora,sans-serif; font-size:13px; color:var(--t1); appearance:none; cursor:pointer;"
+                >
+                    <option value="">Tous</option>
+                    <option value="0"  {% if (nb_comptes ?? '') == '0'  %}selected{% endif %}>Aucun compte (0)</option>
+                    <option value="1"  {% if (nb_comptes ?? '') == '1'  %}selected{% endif %}>1 compte</option>
+                    <option value="2"  {% if (nb_comptes ?? '') == '2'  %}selected{% endif %}>2 comptes</option>
+                    <option value="3+" {% if (nb_comptes ?? '') == '3+' %}selected{% endif %}>3 comptes ou plus</option>
+                </select>
+            </div>
+        </div>
+
+        {# Boutons #}
+        <div style="display:flex; gap:10px; align-items:center;">
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="fas fa-search"></i> Rechercher
+            </button>
+            {% if search or iban or nb_comptes %}
+            <a href="{{ path('admin_clients') }}" class="btn btn-outline btn-sm">
+                <i class="fas fa-times"></i> Réinitialiser
+            </a>
+            <span style="font-size:12px; color:var(--t3);">
+                {{ clients|length }} résultat{{ clients|length > 1 ? 's' : '' }}
+            </span>
+            {% endif %}
+        </div>
+    </div>
 </form>
 
+{# ── Tableau des clients ── #}
 {% if clients is empty %}
-<div class="empty-state" style="background: #111827; border: 1px solid #1e293b; border-radius: 16px;">
-    <div class="empty-icon"><i class="fas fa-users"></i></div>
+<div class="empty-state" style="background:white; border:1px solid var(--border); border-radius:var(--r);">
+    <div class="empty-icon"><i class="fas fa-user-slash"></i></div>
     <div class="empty-title">Aucun client trouvé</div>
+    <div class="empty-text">Essayez d'autres critères de recherche.</div>
+    <a href="{{ path('admin_clients') }}" class="btn btn-outline">
+        <i class="fas fa-redo"></i> Voir tous les clients
+    </a>
 </div>
 {% else %}
 <div class="table-container">
@@ -32,38 +107,45 @@
                 <th>Téléphone</th>
                 <th>Comptes</th>
                 <th>Inscrit le</th>
-                <th>Actions</th>
+                <th style="text-align:center;">Actions</th>
             </tr>
         </thead>
         <tbody>
         {% for client in clients %}
         <tr>
             <td>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 36px; height: 36px; background: linear-gradient(135deg, #6366f1, #4338ca); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:36px; height:36px; background:linear-gradient(135deg,#6366f1,#4338ca); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:white; flex-shrink:0;">
                         {{ client.prenom|first|upper }}{{ client.nom|first|upper }}
                     </div>
-                    <span style="font-weight: 600; font-size: 14px;">{{ client.fullName }}</span>
+                    <div>
+                        <div style="font-weight:600; font-size:14px; color:var(--t1);">{{ client.fullName }}</div>
+                        {% if client.adresse %}
+                        <div style="font-size:11px; color:var(--t3);">{{ client.adresse }}</div>
+                        {% endif %}
+                    </div>
                 </div>
             </td>
-            <td style="font-size: 13px; color: #64748b;">{{ client.email }}</td>
-            <td style="font-size: 13px; color: #64748b;">{{ client.telephone ?? '—' }}</td>
+            <td>{{ client.email }}</td>
+            <td>{{ client.telephone ?? '—' }}</td>
             <td>
-                <span style="background: rgba(99,102,241,0.15); color: #818cf8; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                <span style="background:#ede9fe; color:#4f46e5; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700;">
                     {{ client.comptesBancaires|length }}
                 </span>
             </td>
-            <td style="font-size: 13px; color: #64748b;">{{ client.createdAt|date('d/m/Y') }}</td>
+            <td>{{ client.createdAt|date('d/m/Y') }}</td>
             <td>
-                <div style="display: flex; gap: 6px;">
-                    <a href="{{ path('admin_client_show', {id: client.id}) }}" class="btn btn-outline btn-sm" title="Voir">
+                <div style="display:flex; gap:6px; justify-content:center;">
+                    <a href="{{ path('admin_client_show', {id: client.id}) }}"
+                       class="btn btn-outline btn-sm" title="Voir le détail">
                         <i class="fas fa-eye"></i>
                     </a>
-                    <a href="{{ path('admin_client_edit', {id: client.id}) }}" class="btn btn-outline btn-sm" title="Modifier">
+                    <a href="{{ path('admin_client_edit', {id: client.id}) }}"
+                       class="btn btn-outline btn-sm" title="Modifier">
                         <i class="fas fa-edit"></i>
                     </a>
-                    <form method="post" action="{{ path('admin_client_delete', {id: client.id}) }}" 
-                          onsubmit="return confirm('Supprimer le client {{ client.fullName|e('js') }} ?')">
+                    <form method="post" action="{{ path('admin_client_delete', {id: client.id}) }}"
+                          onsubmit="return confirm('Supprimer définitivement {{ client.fullName|e('js') }} et tous ses comptes ?')">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ client.id) }}">
                         <button type="submit" class="btn btn-danger btn-sm" title="Supprimer">
                             <i class="fas fa-trash"></i>
@@ -77,4 +159,5 @@
     </table>
 </div>
 {% endif %}
+
 {% endblock %}
