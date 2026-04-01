@@ -49,10 +49,14 @@ class CompteBancaire
     #[ORM\OneToMany(mappedBy: 'compteDestinataire', targetEntity: Transaction::class)]
     private Collection $transactionsRecues;
 
+    #[ORM\OneToMany(mappedBy: 'compte', targetEntity: \App\Entity\CarteVirtuelle::class, cascade: ['remove'])]
+    private Collection $cartesVirtuelles;
+
     public function __construct()
     {
         $this->transactionsEmises = new ArrayCollection();
         $this->transactionsRecues = new ArrayCollection();
+        $this->cartesVirtuelles   = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -92,6 +96,7 @@ class CompteBancaire
 
     public function getTransactionsEmises(): Collection { return $this->transactionsEmises; }
     public function getTransactionsRecues(): Collection { return $this->transactionsRecues; }
+    public function getCartesVirtuelles(): Collection { return $this->cartesVirtuelles; }
 
     public function getAllTransactions(): Collection
     {

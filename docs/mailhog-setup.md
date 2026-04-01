@@ -77,13 +77,18 @@ docker run -d --name mailhog -p 1025:1025 -p 8025:8025 mailhog/mailhog
 
 ### Windows
 
-```powershell
-# Option 1 — Fenêtre normale
-MailHog.exe
+Ouvrez un terminal (PowerShell ou cmd) et lancez :
 
-# Option 2 — En arrière-plan (minimisé)
-Start-Process MailHog.exe -WindowStyle Minimized
 ```
+MailHog.exe
+```
+
+Laissez le terminal ouvert pendant que vous développez. Quand vous voyez :
+```
+[SMTP] Binding to address: 0.0.0.0:1025
+Serving under http://0.0.0.0:8025/
+```
+MailHog est prêt.
 
 ### macOS / Linux
 

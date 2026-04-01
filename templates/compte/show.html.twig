@@ -25,6 +25,126 @@
     {% endif %}
 </div>
 
+{# ===== CARTES VIRTUELLES ===== #}
+<div class="card cartes-section">
+    <div class="card-header">
+        <div>
+            <h3 class="card-title"><i class="fas fa-credit-card" style="color: var(--iris);"></i> Cartes virtuelles</h3>
+            <p style="font-size: 13px; color: var(--text-3); margin: 0;">Générez des cartes éphémères Visa ou Mastercard</p>
+        </div>
+        {% if compte.isActif %}
+        <div style="display: flex; gap: 8px;">
+            <form method="post" action="{{ path('app_carte_generer', {id: compte.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('carte_generer_' ~ compte.id) }}">
+                <input type="hidden" name="type" value="visa">
+                <button type="submit" class="btn btn-outline btn-sm">
+                    <span class="visa-logo-sm">VISA</span> Générer
+                </button>
+            </form>
+            <form method="post" action="{{ path('app_carte_generer', {id: compte.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('carte_generer_' ~ compte.id) }}">
+                <input type="hidden" name="type" value="mastercard">
+                <button type="submit" class="btn btn-outline btn-sm">
+                    <span class="mc-logo-sm"><span class="mc-left"></span><span class="mc-right"></span></span> Générer
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    {% set cartesActives = compte.cartesVirtuelles|filter(c => c.isActive) %}
+    {% if cartesActives is empty %}
+    <div class="empty-state" style="padding: 28px;">
+        <div class="empty-icon" style="font-size: 32px;"><i class="fas fa-credit-card"></i></div>
+        <div class="empty-text" style="margin-bottom: 0;">Aucune carte virtuelle active — générez-en une ci-dessus</div>
+    </div>
+    {% else %}
+    <div class="cartes-grid-virt">
+        {% for carte in cartesActives %}
+
+        {# Flip card — checkbox trick, no JS needed #}
+        <div class="virt-card-wrapper">
+            <input type="checkbox" id="flip-{{ carte.id }}" class="virt-flip-toggle">
+
+            <div class="virt-card-flipper">
+
+                {# FACE AVANT #}
+                <div class="virt-card virt-card--{{ carte.type }} virt-card-face virt-card-face--front">
+                    <div class="virt-card__top">
+                        <div class="virt-card__chip">
+                            <div class="chip-line"></div>
+                            <div class="chip-line"></div>
+                            <div class="chip-line"></div>
+                        </div>
+                        {% if carte.type == 'visa' %}
+                            <span class="virt-card__logo virt-card__logo--visa">VISA</span>
+                        {% else %}
+                            <span class="virt-card__logo virt-card__logo--mc">
+                                <span class="mc-circle mc-circle--left"></span>
+                                <span class="mc-circle mc-circle--right"></span>
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div class="virt-card__number">{{ carte.numeroMasque }}</div>
+                    <div class="virt-card__bottom">
+                        <div>
+                            <div class="virt-card__meta-label">Expire</div>
+                            <div class="virt-card__meta-value">{{ carte.dateExpirationFormatee }}</div>
+                        </div>
+                        <div style="margin-left: auto;">
+                            <span class="status-badge status-actif" style="font-size: 10px;">Active</span>
+                        </div>
+                    </div>
+                    <label for="flip-{{ carte.id }}" class="btn btn-outline btn-sm virt-card-face__btn-flip">
+                        <i class="fas fa-eye"></i> Voir infos
+                    </label>
+                </div>
+
+                {# FACE ARRIÈRE #}
+                <div class="virt-card virt-card--{{ carte.type }} virt-card-face virt-card-face--back">
+                    <div class="virt-card__stripe"></div>
+                    <div class="virt-card__back-content">
+                        <div class="virt-card__back-row">
+                            <span class="virt-card__meta-label">Numéro complet</span>
+                            <span class="virt-card__number" style="font-size: 13px;">{{ carte.numero }}</span>
+                        </div>
+                        <div class="virt-card__back-row">
+                            <span class="virt-card__meta-label">Date d'expiration</span>
+                            <span class="virt-card__meta-value">{{ carte.dateExpirationFormatee }}</span>
+                        </div>
+                        <div class="virt-card__back-row">
+                            <span class="virt-card__meta-label">CVV</span>
+                            <span class="virt-card__meta-value virt-card__cvv">{{ carte.cvv }}</span>
+                        </div>
+                    </div>
+                    <label for="flip-{{ carte.id }}" class="btn btn-outline btn-sm virt-card-face__btn-flip">
+                        <i class="fas fa-eye-slash"></i> Masquer
+                    </label>
+                </div>
+
+            </div>{# /flipper #}
+
+            {# Actions sous la carte #}
+            <div class="virt-card-actions">
+                <a href="{{ path('app_carte_transactions', {id: compte.id, carteId: carte.id}) }}"
+                   class="btn btn-outline btn-sm" style="flex: 1; justify-content: center;">
+                    <i class="fas fa-list-alt"></i> Transactions
+                </a>
+                <form method="post" action="{{ path('app_carte_resilier', {id: compte.id, carteId: carte.id}) }}"
+                      onsubmit="return confirm('Résilier cette carte définitivement ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('carte_resilier_' ~ carte.id) }}">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fas fa-times-circle"></i> Résilier
+                    </button>
+                </form>
+            </div>
+        </div>{# /wrapper #}
+
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
 <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; align-items: start;">
     <div>
         <div class="compte-card {{ compte.type }}" style="margin-bottom: 20px;">

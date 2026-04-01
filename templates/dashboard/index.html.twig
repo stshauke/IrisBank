@@ -60,7 +60,14 @@
             <div class="comptes-grid">
                 {% for compte in comptes %}
                     <a href="{{ path('app_comptes_show', {id: compte.id}) }}" class="card-link">
-                        <div class="compte-card {{ compte.type }}">
+                        <div class="compte-card {{ compte.type }}{% if compte.isBloque %} compte-card--bloque{% endif %}">
+                            {% if compte.isBloque %}
+                                <div class="compte-card-freeze">
+                                    <i class="fas fa-snowflake compte-card-freeze__icon"></i>
+                                    {# <span class="compte-card-freeze__label">Compte bloqué</span> #}
+                                </div>
+                            {% endif %}
+
                             <div class="badge">
                                 <i class="fas fa-{% if compte.type == 'courant' %}credit-card{% elseif compte.type == 'livret_a' %}piggy-bank{% else %}home{% endif %}"></i>
                                 {{ compte.typeLabel }}

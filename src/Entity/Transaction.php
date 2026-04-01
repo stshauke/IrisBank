@@ -28,6 +28,10 @@ class Transaction
     #[ORM\JoinColumn(nullable: true)]
     private ?CompteBancaire $compteDestinataire = null;
 
+    #[ORM\ManyToOne(inversedBy: 'transactions')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?CarteVirtuelle $carteVirtuelle = null;
+
     #[ORM\Column(length: 30)]
     private ?string $type = null;
 
@@ -81,4 +85,7 @@ class Transaction
 
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
     public function setCreatedAt(\DateTimeImmutable $createdAt): static { $this->createdAt = $createdAt; return $this; }
+
+    public function getCarteVirtuelle(): ?CarteVirtuelle { return $this->carteVirtuelle; }
+    public function setCarteVirtuelle(?CarteVirtuelle $carte): static { $this->carteVirtuelle = $carte; return $this; }
 }
