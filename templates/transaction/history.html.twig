@@ -16,7 +16,7 @@
     <div class="empty-text">Vos opérations bancaires apparaîtront ici.</div>
 </div>
 {% else %}
-<div class="table-container">
+<div class="table-container history-table">
     <table>
         <thead>
             <tr>
@@ -30,22 +30,50 @@
         <tbody>
         {% for tx in transactions %}
         <tr>
-            <td>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div class="tx-icon {{ tx.isCredit ? 'credit' : 'debit' }}" style="width: 34px; height: 34px; font-size: 14px;">
+            <td data-label="Type">
+                <div class="history-type">
+                    <div class="tx-icon {{ tx.isCredit ? 'credit' : 'debit' }} history-type-icon">
                         <i class="fas fa-{% if tx.type == 'depot' %}arrow-down{% elseif tx.type == 'retrait' %}arrow-up{% else %}exchange-alt{% endif %}"></i>
                     </div>
-                    <span style="font-size: 13px; font-weight: 600;" class="{{ tx.isCredit ? 'amount-credit' : 'amount-debit' }}">{{ tx.typeLabel }}</span>
+                    <span class="history-type-label {{ tx.isCredit ? 'amount-credit' : 'amount-debit' }}">
+                        {{ tx.typeLabel }}
+                    </span>
                 </div>
             </td>
-            <td class="muted-cell">{{ tx.libelle ?? '—' }}</td>
-            <td style="font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-3);">
-                {% if tx.compteSource %}{{ tx.compteSource.iban|slice(0, 14) }}...{% endif %}
-                {% if tx.compteDestinataire and tx.compteSource %}→{% endif %}
-                {% if tx.compteDestinataire %}{{ tx.compteDestinataire.iban|slice(0, 14) }}...{% endif %}
+
+            <td data-label="Libellé">
+                <div class="history-label">
+                    {{ tx.libelle ?? '—' }}
+                </div>
             </td>
-            <td style="font-size: 13px; color: var(--text-3); white-space: nowrap;">{{ tx.createdAt|date('d/m/Y à H:i') }}</td>
-            <td style="text-align: right;" class="{{ tx.isCredit ? 'amount-credit' : 'amount-debit' }}">
+
+            <td data-label="Compte">
+                <div class="history-account">
+                    {% if tx.compteSource and tx.compteDestinataire %}
+                        <div class="history-account-line" title="{{ tx.compteSource.iban }} → {{ tx.compteDestinataire.iban }}">
+                            <span>{{ tx.compteSource.iban|slice(0, 8) }}…{{ tx.compteSource.iban|slice(-4) }}</span>
+                            <i class="fas fa-arrow-right history-arrow"></i>
+                            <span>{{ tx.compteDestinataire.iban|slice(0, 8) }}…{{ tx.compteDestinataire.iban|slice(-4) }}</span>
+                        </div>
+                    {% elseif tx.compteSource %}
+                        <div class="history-account-line" title="{{ tx.compteSource.iban }}">
+                            {{ tx.compteSource.iban|slice(0, 8) }}…{{ tx.compteSource.iban|slice(-4) }}
+                        </div>
+                    {% elseif tx.compteDestinataire %}
+                        <div class="history-account-line" title="{{ tx.compteDestinataire.iban }}">
+                            {{ tx.compteDestinataire.iban|slice(0, 8) }}…{{ tx.compteDestinataire.iban|slice(-4) }}
+                        </div>
+                    {% else %}
+                        <div class="history-account-line">—</div>
+                    {% endif %}
+                </div>
+            </td>
+
+            <td data-label="Date" class="history-date">
+                {{ tx.createdAt|date('d/m/Y à H:i') }}
+            </td>
+
+            <td data-label="Montant" class="history-amount {{ tx.isCredit ? 'amount-credit' : 'amount-debit' }}">
                 {{ tx.isCredit ? '+' : '-' }}{{ tx.montantFloat|number_format(2, ',', ' ') }} €
             </td>
         </tr>

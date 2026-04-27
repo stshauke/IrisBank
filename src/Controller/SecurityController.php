@@ -58,7 +58,6 @@ class SecurityController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            $this->addFlash('success', '🎉 Compte créé avec succès ! Bienvenue chez IrisBank.');
             return $this->redirectToRoute('app_login');
         }
 
