@@ -52,7 +52,7 @@
                 <div class="empty-text empty-text-no-margin">Aucun client</div>
             </div>
         {% else %}
-            <div class="table-container table-plain">
+            <div class="table-container table-plain dashboard-clients-table">
                 <table>
                     <thead>
                         <tr>
@@ -74,7 +74,7 @@
                                     <span class="user-inline-name">{{ client.fullName }}</span>
                                 </div>
                             </td>
-                            <td class="muted-cell">{{ client.email }}</td>
+                            <td class="muted-cell email-cell">{{ client.email }}</td>
                             <td class="muted-cell">{{ client.createdAt|date('d/m/Y') }}</td>
                             <td>
                                 <span class="count-badge">

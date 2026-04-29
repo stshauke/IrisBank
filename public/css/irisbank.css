@@ -768,6 +768,45 @@ tbody td {
     font-weight: 700;
 }
 
+.dashboard-clients-table {
+    overflow-x: auto;
+}
+
+.dashboard-clients-table table {
+    min-width: 620px;
+    width: 100%;
+}
+
+.email-cell {
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+    .dashboard-clients-table table {
+        table-layout: fixed;
+    }
+
+    .dashboard-clients-table th:nth-child(1) { width: 170px; }
+    .dashboard-clients-table th:nth-child(2) { width: 170px; }
+    .dashboard-clients-table th:nth-child(3) { width: 110px; }
+    .dashboard-clients-table th:nth-child(4) { width: 90px; }
+    .dashboard-clients-table th:nth-child(5) { width: 80px; }
+}
+
+@media (max-width: 899px) {
+    .dashboard-clients-table table {
+        table-layout: auto;
+    }
+
+    .dashboard-clients-table th,
+    .dashboard-clients-table td {
+        white-space: nowrap;
+    }
+}
+
 /* ============ FORMS ============ */
 .form-wrapper {
     width: 100%;
@@ -1099,16 +1138,14 @@ tbody td {
 
 .comptes-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 20px;
     width: 100%;
 }
 
-.card-link {
-    display: block;
+.comptes-grid .card-link {
+    max-width: 420px;
     width: 100%;
-    text-decoration: none;
-    color: inherit;
 }
 
 .section-head {
